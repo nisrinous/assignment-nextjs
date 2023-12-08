@@ -12,38 +12,47 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { z } from "zod";
+import axios from "axios";
 
-const Inputs = z.object({
-  name: z.string().min(3, {
-    message: "Name must be at least 3 characters",
-  }),
-  email: z
-    .string()
-    .min(3, {
-      message: "Email must be at least 3 characters",
-    })
-    .refine((email) => email.includes("@"), {
-      message: "Email must contain @ symbol",
+import useSWR from "swr";
+import { UserData } from "@/types";
+import toast from "react-hot-toast";
+import router from "next/router";
+import { useState } from "react";
+
+const Inputs = z
+  .object({
+    name: z.string().min(3, {
+      message: "Name must be at least 3 characters",
     }),
-  password: z
-    .string()
-    .min(6, { message: "Password must be at least 6 characters" }),
-  confirmpassword: z
-    .string()
-    .min(6, { message: "Password must be at least 6 characters" }),
-  address: z.string(),
-  phonenumber: z
-    .string()
-    .min(7, {
-      message: "Phone number must be at least 7 characters",
-    })
-    .startsWith("0", {
-      message: "Phone number must start with 0",
-    }),
-  referral: z.string(),
-});
+    email: z
+      .string()
+      .min(3, {
+        message: "Email must be at least 3 characters",
+      })
+      .refine((email) => email.includes("@"), {
+        message: "Email must contain @ symbol",
+      }),
+    password: z.string(),
+    confirmpassword: z.string(),
+    address: z.string(),
+    phonenumber: z
+      .string()
+      .min(7, {
+        message: "Phone number must be at least 7 characters",
+      })
+      .startsWith("0", {
+        message: "Phone number must start with 0",
+      }),
+    referral: z.string(),
+  })
+  .refine((data) => data.password === data.confirmpassword, {
+    message: "Passwords do not match",
+    path: ["confirmpassword"],
+  });
 
 const SignUpForm = () => {
+  const [userData, setUserData] = useState<UserData>();
   const form = useForm<z.infer<typeof Inputs>>({
     resolver: zodResolver(Inputs),
     defaultValues: {
@@ -56,13 +65,48 @@ const SignUpForm = () => {
       referral: "",
     },
   });
-  function onSubmit(data: z.infer<typeof Inputs>) {
-    if (data.password !== data.confirmpassword) {
-      form.setError("confirmpassword", {
-        type: "manual",
-        message: "Passwords do not match",
-      });
+
+  const { data: existingUserData, error: existingUserError } = useSWR(
+    `http://localhost:9000/users?email=${form.getValues("email")}`,
+    async (url) => {
+      const response = await axios.get(url);
+      return response.data;
+    }
+  );
+
+  function onSubmit(formData: z.infer<typeof Inputs>) {
+    if (existingUserError) {
+      toast.error("Error fetching existing user data");
       return;
+    }
+    if (existingUserData && existingUserData.length > 0) {
+      toast.error("Email already exists");
+      return;
+    }
+
+    setUserData({
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+      address: formData.address,
+      phonenumber: formData.phonenumber,
+      referral: formData.referral,
+      like: [],
+      expired_subs: "",
+    });
+
+    try {
+      const poster = async (url: string) => {
+        const response = await axios.post(url, userData);
+        console.log(response.data);
+        if (response.data) {
+          toast.success("User signed up successfully!");
+          router.push("/dashboard");
+        }
+      };
+      poster("http://localhost:9000/users");
+    } catch (error) {
+      toast.error("" + error);
     }
   }
 
@@ -158,14 +202,14 @@ const SignUpForm = () => {
               <FormItem>
                 <FormLabel>Referral Code</FormLabel>
                 <FormControl>
-                  <Input type="text" placeholder="Referral code" {...field} />
+                  <Input type="text" placeholder="Referral e-mail" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
           <Button type="submit">
-            Sign in
+            Sign up
             <span className="sr-only">Sign up</span>
           </Button>
         </form>
@@ -173,5 +217,4 @@ const SignUpForm = () => {
     </>
   );
 };
-
 export default SignUpForm;

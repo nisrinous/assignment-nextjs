@@ -1,5 +1,3 @@
-"use client";
-
 import * as React from "react";
 
 import {
@@ -14,10 +12,10 @@ import Link from "next/link";
 import Logo from "@/components/logo";
 import SignUpForm from "@/components/form/signupform";
 
-export default function SignIn() {
+export default function SignUp() {
   return (
     <>
-      <div className="h-full flex flex-col gap-5 justify-center md:gap-0 md:h-screen md:flex-row md:items-center">
+      <div className="h-full md:h-screen flex flex-col md:flex-row gap-5 justify-center md:gap-0 md:items-center">
         <div className="mx-auto mt-5">
           <Logo />
         </div>
