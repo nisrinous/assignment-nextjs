@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Form,
   FormControl,
@@ -12,6 +14,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { z } from "zod";
+import useSWR from "swr";
+import axios from "axios";
+import toast from "react-hot-toast";
+import router from "next/router";
 
 const Inputs = z.object({
   email: z
@@ -22,9 +28,7 @@ const Inputs = z.object({
     .refine((email) => email.includes("@"), {
       message: "Email must contain @ symbol",
     }),
-  password: z
-    .string()
-    .min(6, { message: "Password must be at least 6 characters" }),
+  password: z.string(),
 });
 
 const SignInForm = () => {
@@ -35,7 +39,31 @@ const SignInForm = () => {
       password: "",
     },
   });
-  function onSubmit(data: z.infer<typeof Inputs>) {}
+
+  const { data: existingUserData, error: existingUserError } = useSWR(
+    `http://localhost:9000/users?email=${form.getValues(
+      "email"
+    )}&password=${form.getValues("password")}`,
+    async (url) => {
+      const response = await axios.get(url);
+      return response.data;
+    }
+  );
+
+  function onSubmit(formData: z.infer<typeof Inputs>) {
+    if (existingUserError) {
+      toast.error("Error fetching user data");
+      return;
+    }
+    if (existingUserData.length === 0) {
+      toast.error("Incorrect e-mail or password");
+      return;
+    }
+    if (existingUserData && existingUserData.length > 0) {
+      toast.success("User successfully signed in!");
+      router.push("/dashboard");
+    }
+  }
 
   return (
     <>

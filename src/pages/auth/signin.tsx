@@ -21,7 +21,7 @@ export default function SignIn() {
         <div className="mx-auto mt-5">
           <Logo />
         </div>
-        <div className="mx-auto lg:w-1/3 w-sm">
+        <div className="mx-auto lg:w-1/4 w-sm mb-10 md:mb-0">
           <Card>
             <CardHeader className="space-y-1">
               <CardTitle className="text-4xl text-center">Sign In</CardTitle>
