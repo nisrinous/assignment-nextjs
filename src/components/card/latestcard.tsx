@@ -12,7 +12,7 @@ import {
 import { Badge } from "../ui/badge";
 import { PiSparkleLight } from "react-icons/pi";
 
-const NewsCard = ({
+const LatestCard = ({
   image,
   title,
   desc,
@@ -24,12 +24,12 @@ const NewsCard = ({
   isPrem: boolean;
 }) => {
   return (
-    <Card className="w-full rounded-sm flex flex-col justify-between">
+    <Card className="flex-1 rounded-sm flex flex-col justify-between w-[300px]">
       <CardHeader className="relative">
         <img src={image} />
         {isPrem ? (
           <Badge
-            className={`pointer-events-none absolute right-2 top-2 rounded-sm px-2 py-0.5 font-semibold ${
+            className={`pointer-events-none absolute right-6 bottom-3 rounded-sm px-3 py-1 font-semibold ${
               isPrem
                 ? "border-none bg-amber-100 text-orange-500"
                 : "border-none bg-white "
@@ -50,4 +50,4 @@ const NewsCard = ({
   );
 };
 
-export default NewsCard;
+export default LatestCard;
