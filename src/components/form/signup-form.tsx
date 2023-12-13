@@ -52,7 +52,6 @@ const Inputs = z
   });
 
 const SignUpForm = () => {
-  const [userData, setUserData] = useState<UserData>();
   const form = useForm<z.infer<typeof Inputs>>({
     resolver: zodResolver(Inputs),
     defaultValues: {
@@ -84,24 +83,23 @@ const SignUpForm = () => {
       return;
     }
 
-    setUserData({
-      name: formData.name,
-      email: formData.email,
-      password: formData.password,
-      address: formData.address,
-      phonenumber: formData.phonenumber,
-      referral: formData.referral,
-      like: [],
-      expired_subs: "",
-    });
-
     try {
       const poster = async (url: string) => {
-        const response = await axios.post(url, userData);
-        console.log(response.data);
+        const response = await axios.post(url, {
+          role: "user",
+          member: "basic",
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          address: formData.address,
+          phonenumber: formData.phonenumber,
+          referral: formData.referral,
+          like: [],
+          expired_subs: "",
+        });
         if (response.data) {
-          toast.success("User signed up successfully!");
-          router.push("/dashboard");
+          toast.success("User successfully signed up!");
+          router.push("/auth/signin");
         }
       };
       poster("http://localhost:9000/users");

@@ -10,7 +10,7 @@ import {
 
 import Link from "next/link";
 import Logo from "@/components/logo";
-import SignUpForm from "@/components/form/signupform";
+import SignUpForm from "@/components/form/signup-form";
 
 export default function SignUp() {
   return (

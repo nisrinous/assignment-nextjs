@@ -40,7 +40,7 @@ const SignInForm = () => {
     },
   });
 
-  const { data: existingUserData, error: existingUserError } = useSWR(
+  const { data, error } = useSWR(
     `http://localhost:9000/users?email=${form.getValues(
       "email"
     )}&password=${form.getValues("password")}`,
@@ -51,15 +51,15 @@ const SignInForm = () => {
   );
 
   function onSubmit(formData: z.infer<typeof Inputs>) {
-    if (existingUserError) {
-      toast.error("Error fetching user data");
+    if (error) {
+      toast.error("" + error);
       return;
     }
-    if (existingUserData.length === 0) {
+    if (data.length === 0) {
       toast.error("Incorrect e-mail or password");
       return;
     }
-    if (existingUserData && existingUserData.length > 0) {
+    if (data && data.length > 0) {
       toast.success("User successfully signed in!");
       router.push("/dashboard");
     }

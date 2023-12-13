@@ -12,7 +12,7 @@ import {
 
 import Link from "next/link";
 import Logo from "@/components/logo";
-import SignInForm from "@/components/form/signinform";
+import SignInForm from "@/components/form/signin-form";
 
 export default function SignIn() {
   return (
