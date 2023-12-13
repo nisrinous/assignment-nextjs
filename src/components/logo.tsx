@@ -1,6 +1,8 @@
+import Link from "next/link";
+
 const Logo = () => {
   return (
-    <>
+    <Link href="/dashboard">
       <svg
         className="w-[300px] h-[90px]"
         version="1.0"
@@ -92,7 +94,7 @@ l46 44 6 -29 c3 -16 14 -37 23 -46 15 -16 18 -16 42 6 13 13 37 49 52 81 16
           />
         </g>
       </svg>
-    </>
+    </Link>
   );
 };
 

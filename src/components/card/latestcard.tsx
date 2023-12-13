@@ -11,18 +11,26 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "../ui/badge";
 import { PiSparkleLight } from "react-icons/pi";
+import router from "next/router";
+import Link from "next/link";
 
 const LatestCard = ({
   image,
   title,
   desc,
   isPrem,
+  newsId,
 }: {
   image: string;
   title: string;
   desc: string;
   isPrem: boolean;
+  newsId: string;
 }) => {
+  function newsDetails() {
+    router.push("/news/:id");
+  }
+
   return (
     <Card className="flex-1 rounded-sm flex flex-col justify-between w-[300px]">
       <CardHeader className="relative">
@@ -41,10 +49,14 @@ const LatestCard = ({
       </CardHeader>
       <CardContent>
         <CardTitle>{title}</CardTitle>
-        <CardDescription>{desc.substring(0, 120)}...</CardDescription>
+        <CardDescription className="line-clamp-3">{desc}</CardDescription>
       </CardContent>
       <CardFooter>
-        <Button>More...</Button>
+        <Button>
+          <Link href={`/dashboard/news/${newsId}`} passHref>
+            More
+          </Link>
+        </Button>{" "}
       </CardFooter>
     </Card>
   );

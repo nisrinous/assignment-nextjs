@@ -11,20 +11,23 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "../ui/badge";
 import { PiSparkleLight } from "react-icons/pi";
+import Link from "next/link";
 
 const FavoriteCard = ({
   image,
   title,
   desc,
   isPrem,
+  newsId,
 }: {
   image: string;
   title: string;
   desc: string;
   isPrem: boolean;
+  newsId: string;
 }) => {
   return (
-    <Card className="w-full flex-1 rounded-sm flex flex-row items-center">
+    <Card className="w-full flex-1 rounded-sm flex flex-col md:flex-row items-center">
       <CardHeader className="relative p-3">
         <div>
           <img src={image} />
@@ -47,7 +50,9 @@ const FavoriteCard = ({
           </CardDescription>
         </CardContent>
         <CardFooter className="pb-0">
-          <Button>More...</Button>
+          <Link href={`/dashboard/news/${newsId}`} passHref>
+            <Button>More</Button>
+          </Link>
         </CardFooter>
       </div>
     </Card>
