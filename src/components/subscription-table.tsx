@@ -45,100 +45,6 @@ import { useState } from "react";
 import axios from "axios";
 import useSWR from "swr";
 
-const deactivateSubscription = async (userId: string) => {
-  try {
-    await axios.patch(`http://localhost:9000/users/${userId}`, {
-      member: "basic",
-    });
-  } catch (error) {
-    console.error("", error);
-  }
-};
-
-export const columns: ColumnDef<UserData>[] = [
-  {
-    accessorKey: "id",
-    header: "ID",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("id")}</div>,
-  },
-  {
-    accessorKey: "member",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Member
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => (
-      <div className="capitalize pl-4">{row.getValue("member")}</div>
-    ),
-  },
-  {
-    accessorKey: "email",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Email
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => (
-      <div className="lowercase pl-4">{row.getValue("email")}</div>
-    ),
-  },
-
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      if (row.getValue("member") === "premium") {
-        return (
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button>Deactivate</Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle className="text-3xl">
-                  Deactivate Subscription
-                </DialogTitle>
-                <DialogDescription className="text-base">
-                  Deactivate{" "}
-                  <span className=" font-semibold">
-                    {row.getValue("email")}{" "}
-                  </span>
-                  subscription? <br />
-                  This action can not be undone.
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
-                <DialogClose>
-                  <Button
-                    type="button"
-                    onClick={() => deactivateSubscription(row.getValue("id"))}
-                  >
-                    Deactivate
-                  </Button>
-                </DialogClose>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        );
-      }
-      return null;
-    },
-  },
-];
-
 function SubscriptionTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -146,11 +52,108 @@ function SubscriptionTable() {
   const [rowSelection, setRowSelection] = useState({});
   const [users, setUsers] = useState<UserData[]>([]);
 
-  const fetcher = useSWR("http://localhost:9000/users", async (url) => {
-    const response = await axios.get(url);
-    const fetchedNews: UserData[] = response.data;
-    setUsers(fetchedNews);
-  });
+  const { data, mutate } = useSWR(
+    "http://localhost:9000/users",
+    async (url) => {
+      const response = await axios.get(url);
+      const fetchedNews: UserData[] = response.data;
+      setUsers(fetchedNews);
+    }
+  );
+
+  const deactivateSubscription = async (userId: string) => {
+    try {
+      await axios.patch(`http://localhost:9000/users/${userId}`, {
+        member: "basic",
+      });
+      mutate();
+    } catch (error) {
+      console.error("", error);
+    }
+  };
+
+  const columns: ColumnDef<UserData>[] = [
+    {
+      accessorKey: "id",
+      header: "ID",
+      cell: ({ row }) => <div className="capitalize">{row.getValue("id")}</div>,
+    },
+    {
+      accessorKey: "member",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Member
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        );
+      },
+      cell: ({ row }) => (
+        <div className="capitalize pl-4">{row.getValue("member")}</div>
+      ),
+    },
+    {
+      accessorKey: "email",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Email
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        );
+      },
+      cell: ({ row }) => (
+        <div className="lowercase pl-4">{row.getValue("email")}</div>
+      ),
+    },
+    {
+      id: "actions",
+      enableHiding: false,
+      cell: ({ row }) => {
+        if (row.getValue("member") === "premium") {
+          return (
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button>Deactivate</Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle className="text-3xl">
+                    Deactivate Subscription
+                  </DialogTitle>
+                  <DialogDescription className="text-base">
+                    Deactivate{" "}
+                    <span className=" font-semibold">
+                      {row.getValue("email")}{" "}
+                    </span>
+                    subscription? <br />
+                    This action can not be undone.
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <DialogClose>
+                    <Button
+                      type="button"
+                      onClick={() => deactivateSubscription(row.getValue("id"))}
+                    >
+                      Deactivate
+                    </Button>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          );
+        }
+        return null;
+      },
+    },
+  ];
 
   const table = useReactTable({
     data: users,
@@ -189,32 +192,6 @@ function SubscriptionTable() {
             }
             className="max-w-sm"
           />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="ml-auto">
-                Columns <ChevronDown className="ml-2 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {table
-                .getAllColumns()
-                .filter((column) => column.getCanHide())
-                .map((column) => {
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      className="capitalize"
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) =>
-                        column.toggleVisibility(!!value)
-                      }
-                    >
-                      {column.id}
-                    </DropdownMenuCheckboxItem>
-                  );
-                })}
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
         <div className="rounded-md border text-base">
           <Table>
@@ -267,10 +244,7 @@ function SubscriptionTable() {
           </Table>
         </div>
         <div className="flex items-center justify-end space-x-2 py-4">
-          <div className="flex-1 text-sm text-muted-foreground">
-            {table.getFilteredSelectedRowModel().rows.length} of{" "}
-            {table.getFilteredRowModel().rows.length} row(s) selected.
-          </div>
+          <div className="flex-1 text-sm text-muted-foreground"></div>
           <div className="space-x-2">
             <Button
               variant="outline"
