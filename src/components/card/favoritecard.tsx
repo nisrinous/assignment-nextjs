@@ -12,6 +12,13 @@ import {
 import { Badge } from "../ui/badge";
 import { PiSparkleLight } from "react-icons/pi";
 import Link from "next/link";
+import { PiHeart } from "react-icons/pi";
+import { FcLike } from "react-icons/fc";
+import { useState } from "react";
+import useSWR from "swr";
+import { NewsData } from "@/types";
+import axios from "axios";
+import { boolean, undefined } from "zod";
 
 const FavoriteCard = ({
   image,
@@ -19,13 +26,39 @@ const FavoriteCard = ({
   desc,
   isPrem,
   newsId,
+  likes,
 }: {
   image: string;
   title: string;
   desc: string;
   isPrem: boolean;
   newsId: string;
+  likes: number;
 }) => {
+  const { data, mutate } = useSWR("http://localhost:9000/news", async (url) => {
+    const response = await axios.get(url);
+    return response.data;
+  });
+  const handleLike = async () => {
+    try {
+      if (liked && likes > 0) {
+        await axios.patch(`http://localhost:9000/news/${newsId}`, {
+          like: likes - 1,
+        });
+      }
+      if (!liked) {
+        await axios.patch(`http://localhost:9000/news/${newsId}`, {
+          like: likes + 1,
+        });
+      }
+      mutate();
+      setLiked((prev) => !prev);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const [liked, setLiked] = useState<boolean>();
+
   return (
     <Card className="w-full flex-1 rounded-sm flex flex-col md:flex-row items-center">
       <CardHeader className="relative p-3">
@@ -50,9 +83,17 @@ const FavoriteCard = ({
           </CardDescription>
         </CardContent>
         <CardFooter className="pb-0">
-          <Link href={`/dashboard/news/${newsId}`} passHref>
-            <Button>More</Button>
+          <Link href={`/news/${newsId}`} passHref>
+            <Button>More..</Button>
           </Link>
+          <Button
+            variant="ghost"
+            className="right-0 top-0 h-full pl-5 pr-1 py-1 hover:bg-transparent"
+            onClick={() => handleLike()}
+          >
+            {liked ? <FcLike size={30} /> : <PiHeart size={27} />}
+          </Button>
+          <p>{likes <= 0 ? null : likes}</p>
         </CardFooter>
       </div>
     </Card>
