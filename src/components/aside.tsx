@@ -1,17 +1,12 @@
 const Aside = () => {
   return (
-    <aside className="fixed top-14 z-30 -ml-2 hidden h-[calc(100vh-3.5rem)] w-1/6 shrink-0 overflow-y-auto border-r md:sticky md:block">
-      <div className="relative overflow-hidden py-6 pr-6">
+    <aside className="bg-white fixed hidden w-1/6 shrink-0 overflow-y-auto border-r md:sticky md:block">
+      <div className="overflow-hidden py-6 pr-6">
         <div className="h-full w-full rounded-[inherit]">
           <div className="min-w-full table">
             <img className=""></img>
-            <div className="flex w-full flex-col gap-2 p-1 mt-10">
-              <a
-                aria-label="Account"
-                target=""
-                rel=""
-                href="/dashboard/account"
-              >
+            <div className="flex w-full flex-col gap-2 p-5 mt-10">
+              <a aria-label="Account" target="" rel="" href="/admin">
                 <span className="group flex w-full items-center rounded-md border border-transparent px-2 py-1 hover:bg-muted hover:text-foreground text-muted-foreground">
                   <svg
                     width="15"
@@ -32,7 +27,7 @@ const Aside = () => {
                   <span>Account</span>
                 </span>
               </a>
-              <a aria-label="Stores" target="" rel="" href="/dashboard/stores">
+              <a aria-label="Stores" target="" rel="" href="/admin/news">
                 <span className="group flex w-full items-center rounded-md border border-transparent px-2 py-1 hover:bg-muted hover:text-foreground text-muted-foreground">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -58,7 +53,7 @@ const Aside = () => {
                 aria-label="Billing"
                 target=""
                 rel=""
-                href="/dashboard/billing"
+                href="/admin/subscriptions"
               >
                 <span className="group flex w-full items-center rounded-md border border-transparent px-2 py-1 hover:bg-muted hover:text-foreground text-muted-foreground">
                   <svg
@@ -82,7 +77,7 @@ const Aside = () => {
                 aria-label="Purchases"
                 target=""
                 rel=""
-                href="/dashboard/purchases"
+                href="/admin/transactions"
               >
                 <span className="group flex w-full items-center rounded-md border border-transparent px-2 py-1 hover:bg-muted hover:text-foreground text-muted-foreground">
                   <svg

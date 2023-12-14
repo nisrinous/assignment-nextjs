@@ -63,8 +63,8 @@ const AddNewsForm = () => {
           like: 0,
         });
         if (response.data) {
-          toast.success("User successfully signed up!");
-          router.push("/dashboard");
+          toast.success("News added successfully!");
+          router.push("/admin/news");
         }
       };
       poster("http://localhost:9000/news");
