@@ -10,35 +10,39 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
 import { z } from "zod";
 import axios from "axios";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
-import router from "next/router";
-import { Checkbox } from "../ui/checkbox";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
+} from "@/components/ui/select";
 
 const Inputs = z.object({
   title: z.string().min(10, {
     message: "Title must be at least 10 characters",
   }),
 
-  desc: z
-    .string()
-    .min(200, { message: "Description must be at least 200 characters" }),
+  desc: z.string().min(200, {
+    message: "Description must be at least 200 characters",
+  }),
   image: z.string(),
   category: z.string(),
   isPremium: z.boolean(),
 });
 
-const AddNewsForm = () => {
-  const form = useForm<z.infer<typeof Inputs>>({
+const EditNewsForm = () => {
+  const router = useRouter();
+  const { id } = router.query;
+
+  const form = useForm({
     resolver: zodResolver(Inputs),
     defaultValues: {
       title: "",
@@ -48,6 +52,22 @@ const AddNewsForm = () => {
       isPremium: false,
     },
   });
+
+  useEffect(() => {
+    const fetchNewsData = async () => {
+      try {
+        if (id) {
+          const response = await axios.get(`http://localhost:9000/news/${id}`);
+          const fetchedData = response.data;
+          form.reset(fetchedData);
+        }
+      } catch (error) {
+        console.error("Error fetching news data:", error);
+      }
+    };
+
+    fetchNewsData();
+  }, [id]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -83,14 +103,12 @@ const AddNewsForm = () => {
 
   const onSubmit = async (formData: z.infer<typeof Inputs>) => {
     try {
-      const response = await axios.post("http://localhost:9000/news", {
+      const response = await axios.patch(`http://localhost:9000/news/${id}`, {
         ...formData,
-        created_at: new Date().toString(),
-        updated_at: "",
-        like: 0,
+        updated_at: new Date().toString(),
       });
       if (response.data) {
-        toast.success("News added successfully!");
+        toast.success("News updated successfully!");
         router.push("/admin/news");
       }
     } catch (error) {
@@ -101,25 +119,30 @@ const AddNewsForm = () => {
   return (
     <div className="w-full p-10 bg-white">
       <div className="my-10 flex-col text-center">
-        <h1 className="font-heading text-xl md:text-3xl">News Form </h1>
+        <h1 className="font-heading text-xl md:text-3xl">Edit News</h1>
         <h3 className="leading-tight text-muted-foreground sm:text-xl sm:leading-8">
-          Add news to be displayed on the web
+          Modify news details
         </h3>
       </div>
 
       <Form {...form}>
         <form
           className="grid gap-4 container text-lg"
-          onSubmit={(...args) => void form.handleSubmit(onSubmit)(...args)}
+          onSubmit={form.handleSubmit(onSubmit)}
         >
           <FormField
             control={form.control}
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>News Title</FormLabel>
+                <FormLabel>Edit Title</FormLabel>
                 <FormControl>
-                  <Input type="text" placeholder="News title" {...field} />
+                  <Input
+                    type="text"
+                    placeholder="News title"
+                    value={form.getValues("title")}
+                    onChange={(e) => form.setValue("title", e.target.value)}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -130,12 +153,13 @@ const AddNewsForm = () => {
             name="desc"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>News Description</FormLabel>
+                <FormLabel>Edit Description</FormLabel>
                 <FormControl>
                   <Input
                     type="text"
                     placeholder="News description"
-                    {...field}
+                    value={form.getValues("desc")}
+                    onChange={(e) => form.setValue("desc", e.target.value)}
                   />
                 </FormControl>
                 <FormMessage />
@@ -148,13 +172,13 @@ const AddNewsForm = () => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
-                  Exclusive news
+                  Edit Tag
                   <br />
                 </FormLabel>
                 <div className="flex flex-row gap-3">
                   <FormControl>
                     <Checkbox
-                      checked={field.value}
+                      checked={form.getValues("isPremium")}
                       onCheckedChange={field.onChange}
                     />
                   </FormControl>
@@ -166,14 +190,13 @@ const AddNewsForm = () => {
               </FormItem>
             )}
           />
-
           <FormField
             control={form.control}
             name="image"
             render={({ field }) => (
               <FormItem>
                 <img src={form.getValues("image")} className="h-64"></img>
-                <FormLabel>Supporting Image</FormLabel>
+                <FormLabel>Replace Image</FormLabel>
                 <FormControl>
                   <Input
                     type="file"
@@ -191,9 +214,15 @@ const AddNewsForm = () => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Category</FormLabel>
-                <Select onValueChange={field.onChange}>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={form.getValues("category")}
+                >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a category" />
+                    <SelectValue
+                      placeholder={form.getValues("category")}
+                      className="capitalize"
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="music">Music</SelectItem>
@@ -207,7 +236,7 @@ const AddNewsForm = () => {
           />
 
           <Button type="submit" className="my-5">
-            Add news
+            Update News
             <span className="sr-only">Submit</span>
           </Button>
         </form>
@@ -215,4 +244,5 @@ const AddNewsForm = () => {
     </div>
   );
 };
-export default AddNewsForm;
+
+export default EditNewsForm;

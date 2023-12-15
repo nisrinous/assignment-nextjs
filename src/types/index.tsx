@@ -28,6 +28,6 @@ export type NewsDetail = {
   title: string;
   desc: string;
   image: string;
-  isPrem: boolean;
+  isPremium: boolean;
   newsId: string;
 };
