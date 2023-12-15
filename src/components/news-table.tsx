@@ -68,9 +68,11 @@ function NewsTable() {
     },
     {
       accessorKey: "image",
-      header: "Image",
+      header: ({ column }) => {
+        return <p className="hidden lg:block">Image</p>;
+      },
       cell: ({ row }) => (
-        <img src={row.getValue("image")} className=" h-24"></img>
+        <img src={row.getValue("image")} className="hidden h-24 lg:block"></img>
       ),
     },
     {
@@ -106,11 +108,9 @@ function NewsTable() {
         );
       },
       cell: ({ row }) => (
-        <div className="capitalize pl-4">
+        <div className="capitalize">
           <Button variant="link">
-            <a href={`/dashboard/news/${row.getValue("id")}`}>
-              {row.getValue("title")}
-            </a>
+            <a href={`/news/${row.getValue("id")}`}>{row.getValue("title")}</a>
           </Button>
         </div>
       ),

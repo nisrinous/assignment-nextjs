@@ -49,6 +49,38 @@ const AddNewsForm = () => {
     },
   });
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    const file = files[0];
+    if (!file) return;
+
+    uploadToCloudinary(file);
+  };
+
+  const uploadToCloudinary = async (file: File) => {
+    const fileData = new FormData();
+    fileData.append("file", file);
+    fileData.append("upload_preset", "drearymonday");
+    try {
+      const response = await fetch(
+        "https://api.cloudinary.com/v1_1/minevf/image/upload",
+        {
+          method: "POST",
+          body: fileData,
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        form.setValue("image", data.secure_url);
+      }
+    } catch (error) {
+      console.error("Error uploading to Cloudinary:", error);
+    }
+  };
+
   function onSubmit(formData: z.infer<typeof Inputs>) {
     try {
       const poster = async (url: string) => {
@@ -151,15 +183,7 @@ const AddNewsForm = () => {
                 <FormControl>
                   <Input
                     type="file"
-                    onChange={(e) => {
-                      const files = e.target.files;
-                      if (!files) return;
-
-                      const file = files[0];
-                      if (!file) return;
-
-                      form.setValue("image", URL.createObjectURL(file));
-                    }}
+                    onChange={handleFileChange}
                     ref={field.ref}
                   />
                 </FormControl>
