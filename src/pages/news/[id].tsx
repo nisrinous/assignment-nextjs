@@ -6,9 +6,19 @@ import { useState } from "react";
 import useSWR from "swr";
 import { PiHeart } from "react-icons/pi";
 import { FcLike } from "react-icons/fc";
-import { PiSparkleLight } from "react-icons/pi";
+import { PiSparkleLight, PiShareFatLight } from "react-icons/pi";
 import { IconContext } from "react-icons";
 import Link from "next/link";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export default function Details() {
   const router = useRouter();
@@ -22,17 +32,18 @@ export default function Details() {
     updated_at: "",
     category: "",
     like: 0,
+    share: 0,
   });
   const { id } = router.query;
 
-  const fetcher = useSWR(`http://localhost:9000/news/${id}`, async (url) => {
-    const response = await axios.get(url);
-    setNews(response.data);
-  });
-  const { data, mutate } = useSWR("http://localhost:9000/news", async (url) => {
-    const response = await axios.get(url);
-    return response.data;
-  });
+  const { data, mutate } = useSWR(
+    `http://localhost:9000/news/${id}`,
+    async (url) => {
+      const response = await axios.get(url);
+      setNews(response.data);
+    }
+  );
+
   const handleLike = async () => {
     try {
       if (liked && news.like > 0) {
@@ -46,6 +57,19 @@ export default function Details() {
         });
       }
       setLiked((prev) => !prev);
+      mutate();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleShare = async () => {
+    try {
+      console.log(news.share);
+      await axios.patch(`http://localhost:9000/news/${id}`, {
+        share: news.share + 1,
+      });
+      console.log(news.share + 1);
       mutate();
     } catch (error) {
       console.log(error);
@@ -81,15 +105,60 @@ export default function Details() {
           <h1 className="font-heading text-2xl sm:text-4xl md:text-5xl lg:text-6xl">
             {news.title}
           </h1>
+          <div className="text-muted-foreground">
+            {news.updated_at === ""
+              ? "Created at: " +
+                new Date(news.created_at).toLocaleDateString("en-US", {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })
+              : "Last updated: " +
+                new Date(news.updated_at).toLocaleDateString("en-US", {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+          </div>
           <div className="flex flex-row items-center justify-start gap-2">
-            <Button
-              variant="ghost"
-              className="hover:bg-transparent p-0"
-              onClick={() => handleLike()}
-            >
-              {liked ? <FcLike size={30} /> : <PiHeart size={27} />}
-            </Button>
-            <p>{news.like <= 0 ? null : news.like}</p>
+            <div className="gap-0 flex flex-row justify-center items-center">
+              <Button
+                variant="ghost"
+                className="hover:bg-transparent p-0"
+                onClick={() => handleLike()}
+              >
+                {liked ? <FcLike size={30} /> : <PiHeart size={27} />}
+              </Button>
+              <p>{news.like <= 0 ? null : news.like}</p>
+            </div>
+            <div className="gap-1 flex flex-row justify-center items-center ml-1">
+              <Dialog>
+                <DialogTrigger asChild className="hover:cursor-pointer">
+                  <PiShareFatLight size={29} />
+                </DialogTrigger>
+                <p>{news.share === 0 ? null : news.share}</p>{" "}
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle className="text-3xl">Send a link</DialogTitle>
+                    <DialogDescription className="text-base">
+                      Link to share
+                    </DialogDescription>
+                    <DialogDescription className="text-base border-b-2 py-1 border-purple-200">
+                      {router.pathname}
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <DialogClose>
+                      <Button type="button" onClick={() => handleShare()}>
+                        Copy link
+                      </Button>
+                    </DialogClose>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
         </div>
 

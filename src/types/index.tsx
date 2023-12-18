@@ -23,6 +23,7 @@ export type NewsData = {
   updated_at: string;
   category: string;
   like: number;
+  share: number;
 };
 
 export type NewsDetail = {
