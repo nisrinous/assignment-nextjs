@@ -13,7 +13,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown } from "lucide-react";
+import { ArrowUpDown } from "lucide-react";
 import {
   Dialog,
   DialogClose,
@@ -25,12 +25,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -68,7 +62,7 @@ function SubscriptionTable() {
       });
       mutate();
     } catch (error) {
-      console.error("", error);
+      console.error(error);
     }
   };
 
@@ -110,6 +104,27 @@ function SubscriptionTable() {
       },
       cell: ({ row }) => (
         <div className="lowercase pl-4">{row.getValue("email")}</div>
+      ),
+    },
+    {
+      accessorKey: "expired_subs",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Expire Date
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        );
+      },
+      cell: ({ row }) => (
+        <div className="lowercase pl-4">
+          {row.getValue("member") === "basic"
+            ? ""
+            : new Date(row.getValue("expired_subs")).toLocaleDateString()}
+        </div>
       ),
     },
     {
