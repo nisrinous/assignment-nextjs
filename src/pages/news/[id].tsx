@@ -6,6 +6,9 @@ import { useState } from "react";
 import useSWR from "swr";
 import { PiHeart } from "react-icons/pi";
 import { FcLike } from "react-icons/fc";
+import { PiSparkleLight } from "react-icons/pi";
+import { IconContext } from "react-icons";
+import Link from "next/link";
 
 export default function Details() {
   const router = useRouter();
@@ -33,17 +36,17 @@ export default function Details() {
   const handleLike = async () => {
     try {
       if (liked && news.like > 0) {
-        await axios.patch(`http://localhost:9000/news/${newsId}`, {
+        await axios.patch(`http://localhost:9000/news/${id}`, {
           like: news.like - 1,
         });
       }
       if (!liked) {
-        await axios.patch(`http://localhost:9000/news/${newsId}`, {
+        await axios.patch(`http://localhost:9000/news/${id}`, {
           like: news.like + 1,
         });
       }
-      mutate();
       setLiked((prev) => !prev);
+      mutate();
     } catch (error) {
       console.log(error);
     }
@@ -51,26 +54,47 @@ export default function Details() {
   const [liked, setLiked] = useState<boolean>();
 
   return (
-    <div className=" container flex flex-col justify-start px-80 py-20">
-      <img src={news.image} className="mb-10" alt=""></img>
-
-      <div className="my-10">
-        <h1 className="font-heading text-2xl sm:text-4xl md:text-5xl lg:text-6xl">
-          {news.title}
-        </h1>
-        <div className="flex flex-row items-center justify-start gap-2">
-          <Button
-            variant="ghost"
-            className="hover:bg-transparent p-0"
-            onClick={() => handleLike()}
-          >
-            {liked ? <FcLike size={30} /> : <PiHeart size={27} />}
-          </Button>
-          <p>{news.like <= 0 ? null : news.like}</p>
+    <div className="relative">
+      {news.isPremium ? (
+        <div className="absolute protected-news h-1/2 w-full bottom-0">
+          <div className="absolute bottom-40 right-0 left-0">
+            <h1 className="tracking-tighter lg:leading-[1.1] text-2xl md:text-3xl text-center flex flex-row justify-center">
+              <Link href="/profile/subscription">
+                <Button
+                  variant="link"
+                  className="tracking-tighter lg:leading-[1.1] text-2xl md:text-3xl text-center"
+                >
+                  Subscribe premium for more
+                </Button>
+              </Link>
+              <IconContext.Provider value={{ color: "yellow" }}>
+                <PiSparkleLight />
+              </IconContext.Provider>
+            </h1>
+          </div>
         </div>
-      </div>
+      ) : null}
+      <div className="container flex flex-col justify-start px-80 py-20">
+        <img src={news.image} className="mb-10" alt=""></img>
 
-      <h3 className="leading-normal sm:text-xl sm:leading-8">{news.desc}</h3>
+        <div className="my-10">
+          <h1 className="font-heading text-2xl sm:text-4xl md:text-5xl lg:text-6xl">
+            {news.title}
+          </h1>
+          <div className="flex flex-row items-center justify-start gap-2">
+            <Button
+              variant="ghost"
+              className="hover:bg-transparent p-0"
+              onClick={() => handleLike()}
+            >
+              {liked ? <FcLike size={30} /> : <PiHeart size={27} />}
+            </Button>
+            <p>{news.like <= 0 ? null : news.like}</p>
+          </div>
+        </div>
+
+        <h3 className="leading-normal sm:text-xl sm:leading-8">{news.desc}</h3>
+      </div>
     </div>
   );
 }

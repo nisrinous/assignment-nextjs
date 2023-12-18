@@ -11,6 +11,7 @@ import {
 import Link from "next/link";
 import { CiUser } from "react-icons/ci";
 import { PiSparkleLight } from "react-icons/pi";
+import { IconContext } from "react-icons";
 
 const Menu = () => {
   return (
@@ -30,10 +31,12 @@ const Menu = () => {
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
-            <Link href="/profile/subscription">
+            <Link href="/profile/subscription" className="flex flex-row">
               <span>Premium </span>
+              <IconContext.Provider value={{ color: "yellow" }}>
+                <PiSparkleLight />
+              </IconContext.Provider>
             </Link>
-            <PiSparkleLight />
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
