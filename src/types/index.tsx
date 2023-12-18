@@ -3,6 +3,7 @@ export type UserData = {
   role: "user" | "admin";
   member: "premium" | "basic";
   name: string;
+  username: string;
   email: string;
   password: string;
   address: string;
