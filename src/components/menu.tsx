@@ -8,6 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import Link from "next/link";
 import { CiUser } from "react-icons/ci";
 import { PiSparkleLight } from "react-icons/pi";
 
@@ -24,10 +25,14 @@ const Menu = () => {
         <DropdownMenuSeparator />
         <DropdownMenuGroup className="text-right">
           <DropdownMenuItem>
-            <span>Profile</span>
+            <Link href="/profile">
+              <span>Profile</span>
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
-            <span>Premium </span>
+            <Link href="/profile/subscription">
+              <span>Premium </span>
+            </Link>
             <PiSparkleLight />
           </DropdownMenuItem>
         </DropdownMenuGroup>
