@@ -31,3 +31,13 @@ export type NewsDetail = {
   isPremium: boolean;
   newsId: string;
 };
+
+export type TransactionData = {
+  id: number;
+  user: string;
+  type: 1 | 12;
+  transaction_date: string;
+  status: "processing" | "completed" | "canceled";
+  transaction_completed_date: string;
+  total_paid: 9 | 99;
+};
