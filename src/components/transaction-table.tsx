@@ -122,19 +122,9 @@ function TransactionTable() {
     },
     {
       accessorKey: "user",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            User Email
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        );
-      },
+      header: "User Email",
       cell: ({ row }) => (
-        <div className="lowercase pl-4">{row.getValue("user")}</div>
+        <div className="lowercase">{row.getValue("user")}</div>
       ),
     },
     {
@@ -151,7 +141,9 @@ function TransactionTable() {
         );
       },
       cell: ({ row }) => (
-        <div className="lowercase pl-4">{row.getValue("transaction_date")}</div>
+        <div className="lowercase pl-4">
+          {new Date(row.getValue("transaction_date")).toLocaleDateString()}
+        </div>
       ),
     },
     {
