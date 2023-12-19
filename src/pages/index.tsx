@@ -3,23 +3,21 @@ import axios from "axios";
 import { useState } from "react";
 import useSWR from "swr";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import LatestCard from "@/components/card/latestcard";
-import FavoriteCard from "@/components/card/favoritecard";
+import TrendingCard from "@/components/card/trending-card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import NewsCard from "@/components/card/news-card";
+import { Button } from "@/components/ui/button";
+import Hero from "@/components/hero";
 
 export default function Dashboard() {
+  const [newsData, setNewsdata] = useState<NewsData[]>([]);
   const [mostLike, setMostLike] = useState<NewsData[]>([]);
-  const [latest, setLates] = useState<NewsData[]>([]);
 
   const fetcher = useSWR("http://localhost:9000/news", async (url) => {
     const response = await axios.get(url);
-    const fetchedNews: NewsData[] = response.data;
+    setNewsdata(response.data);
 
-    const sortOnLatest = fetchedNews.sort((current, next) => {
-      return Date.parse(next.created_at) - Date.parse(current.created_at);
-    });
-    setLates(sortOnLatest);
-
-    const sortOnLike = fetchedNews.sort((current, next) => {
+    const sortOnLike = newsData.sort((current, next) => {
       return next.like - current.like;
     });
     setMostLike(sortOnLike);
@@ -27,19 +25,7 @@ export default function Dashboard() {
 
   return (
     <>
-      <section
-        id="hero"
-        aria-labelledby="hero-heading"
-        className="container mx-auto flex w-full flex-col items-center justify-center gap-4 py-12 text-center md:py-32"
-      >
-        <h1 className="font-heading text-3xl sm:text-5xl md:text-6xl lg:text-7xl">
-          Swiftly informed: Dive into Taylor's latest stories!
-        </h1>
-        <h3 className="max-w-[42rem] leading-normal text-muted-foreground sm:text-xl sm:leading-8">
-          From chart-topping hits to exclusive behind-the-scenes, uncover the
-          essence of Taylor Swift's ever-envolving narrative.
-        </h3>
-      </section>
+      <Hero></Hero>
       <div className="container">
         <h3 className="font-heading text-muted-foreground text-xl sm:text-xl md:text-2xl lg:text-3xl">
           Trendings
@@ -48,8 +34,8 @@ export default function Dashboard() {
       <ScrollArea className="container">
         <div className="flex flex-col gap-3 mb-10">
           <div className="flex flex-row gap-7">
-            {latest.slice(0, 5).map((item, i) => (
-              <LatestCard
+            {mostLike.slice(0, 5).map((item, i) => (
+              <TrendingCard
                 key={i}
                 title={item.title}
                 desc={item.desc}
@@ -68,21 +54,140 @@ export default function Dashboard() {
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
       <div className="container">
-        <h3 className="font-heading text-muted-foreground text-xl sm:text-xl md:text-2xl lg:text-3xl">
-          Latest News
-        </h3>
-        <div className="flex flex-col gap-7">
-          {mostLike.map((item, i) => (
-            <FavoriteCard
-              key={i}
-              title={item.title}
-              desc={item.desc}
-              image={item.image}
-              isPremium={item.isPremium}
-              newsId={item.id}
-              likes={item.like}
-            />
-          ))}
+        <div className="flex flex-row gap-10 mb-10">
+          <Tabs
+            defaultValue="all"
+            className="w-2/3 border-r-2 border-white pr-10"
+          >
+            <div>
+              <h3 className="font-heading text-muted-foreground text-xl sm:text-xl md:text-2xl lg:text-3xl">
+                Latest News
+              </h3>
+            </div>
+            <TabsList className="bg-none w-full items-start justify-start">
+              <TabsTrigger value="all" className="bg-none">
+                All
+              </TabsTrigger>
+              <TabsTrigger value="premium" className="bg-none">
+                Premium
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="all" className="mb-10">
+              <div className="flex flex-col gap-7">
+                {newsData.map((item, i) => (
+                  <NewsCard
+                    key={i}
+                    title={item.title}
+                    desc={item.desc}
+                    image={item.image}
+                    isPremium={item.isPremium}
+                    id={item.id}
+                    like={item.like}
+                    created_at={item.created_at}
+                    updated_at={item.updated_at}
+                    category={item.category}
+                    share={item.share}
+                  />
+                ))}
+              </div>
+            </TabsContent>
+            <TabsContent value="premium" className="mb-10">
+              <div className="flex flex-col gap-7">
+                {newsData
+                  .filter((item) => item.isPremium === true)
+                  .map((item, i) => (
+                    <NewsCard
+                      key={i}
+                      title={item.title}
+                      desc={item.desc}
+                      image={item.image}
+                      isPremium={item.isPremium}
+                      id={item.id}
+                      like={item.like}
+                      created_at={item.created_at}
+                      updated_at={item.updated_at}
+                      category={item.category}
+                      share={item.share}
+                    />
+                  ))}
+              </div>
+            </TabsContent>
+          </Tabs>
+          <Tabs defaultValue="world" className="w-1/3 flex-1">
+            <h3 className="font-heading text-muted-foreground text-xl sm:text-xl md:text-2xl">
+              Based on Category
+            </h3>
+            <TabsList className="bg-none w-full items-start justify-start">
+              <TabsTrigger value="world">World</TabsTrigger>
+              <TabsTrigger value="entertainment">Entertainment</TabsTrigger>
+              <TabsTrigger value="music">Music</TabsTrigger>
+            </TabsList>
+            <TabsContent value="world" className="mb-10">
+              <div className="flex flex-col gap-7">
+                {newsData
+                  .filter((item) => item.category.toLowerCase() === "world")
+                  .map((item, i) => (
+                    <NewsCard
+                      key={i}
+                      title={item.title}
+                      desc={item.desc}
+                      image={item.image}
+                      isPremium={item.isPremium}
+                      id={item.id}
+                      like={item.like}
+                      created_at={item.created_at}
+                      updated_at={item.updated_at}
+                      category={item.category}
+                      share={item.share}
+                    />
+                  ))}
+              </div>
+            </TabsContent>
+            <TabsContent value="entertainment" className="mb-10">
+              <div className="flex flex-col gap-7">
+                {newsData
+                  .filter(
+                    (item) => item.category.toLowerCase() === "entertainment"
+                  )
+                  .map((item, i) => (
+                    <NewsCard
+                      key={i}
+                      title={item.title}
+                      desc={item.desc}
+                      image={item.image}
+                      isPremium={item.isPremium}
+                      id={item.id}
+                      like={item.like}
+                      created_at={item.created_at}
+                      updated_at={item.updated_at}
+                      category={item.category}
+                      share={item.share}
+                    />
+                  ))}
+              </div>
+            </TabsContent>
+            <TabsContent value="music" className="mb-10">
+              <div className="flex flex-col gap-7">
+                {newsData
+                  .filter((item) => item.category.toLowerCase() === "music")
+                  .map((item, i) => (
+                    <NewsCard
+                      key={i}
+                      title={item.title}
+                      desc={item.desc}
+                      image={item.image}
+                      isPremium={item.isPremium}
+                      id={item.id}
+                      like={item.like}
+                      created_at={item.created_at}
+                      updated_at={item.updated_at}
+                      category={item.category}
+                      share={item.share}
+                    />
+                  ))}
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </>
