@@ -11,43 +11,26 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "../ui/badge";
 import { PiSparkleLight } from "react-icons/pi";
-import router from "next/router";
-import Link from "next/link";
-import { PiHeart } from "react-icons/pi";
-import { FcLike } from "react-icons/fc";
 import { useState } from "react";
 import useSWR from "swr";
 import axios from "axios";
+import { NewsData } from "@/types";
 
-const LatestCard = ({
-  image,
-  title,
-  desc,
-  isPrem,
-  newsId,
-  likes,
-}: {
-  image: string;
-  title: string;
-  desc: string;
-  isPrem: boolean;
-  newsId: string;
-  likes: number;
-}) => {
+const LatestCard = (news: NewsData) => {
   const { data, mutate } = useSWR("http://localhost:9000/news", async (url) => {
     const response = await axios.get(url);
     return response.data;
   });
   const handleLike = async () => {
     try {
-      if (liked && likes > 0) {
-        await axios.patch(`http://localhost:9000/news/${newsId}`, {
-          like: likes - 1,
+      if (liked && news.like > 0) {
+        await axios.patch(`http://localhost:9000/news/${news.id}`, {
+          like: news.like - 1,
         });
       }
       if (!liked) {
-        await axios.patch(`http://localhost:9000/news/${newsId}`, {
-          like: likes + 1,
+        await axios.patch(`http://localhost:9000/news/${news.id}`, {
+          like: news.like + 1,
         });
       }
       mutate();
@@ -60,12 +43,14 @@ const LatestCard = ({
 
   return (
     <Card className="flex-1 rounded-sm flex flex-col justify-between w-[300px]">
-      <CardHeader className="relative">
-        <img src={image} />
-        {isPrem ? (
+      <CardHeader className="items-center justify-center">
+        <img src={news.image} className="h-[150px] w-min" />
+      </CardHeader>
+      <CardContent>
+        {news.isPremium ? (
           <Badge
-            className={`pointer-events-none absolute right-6 bottom-3 rounded-sm px-3 py-1 font-semibold ${
-              isPrem
+            className={`pointer-events-none rounded-sm px-3 font-semibold mb-2 ${
+              news.isPremium
                 ? "border-none bg-amber-100 text-orange-500"
                 : "border-none bg-white "
             }`}
@@ -73,28 +58,26 @@ const LatestCard = ({
             Premium <PiSparkleLight />
           </Badge>
         ) : null}
-      </CardHeader>
-      <CardContent>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription className="line-clamp-3">{desc}</CardDescription>
+        <CardTitle>
+          <a href={`/news/${news.id}`} className="p-0 hover:cursor-pointer">
+            {news.title}
+          </a>
+        </CardTitle>
+        <CardDescription>
+          {news.updated_at === ""
+            ? new Date(news.created_at).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })
+            : new Date(news.updated_at).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}{" "}
+          {news.like !== 0 ? "· " + news.like + " likes" : null}
+        </CardDescription>
       </CardContent>
-      <CardFooter className="flex flex-row justify-between">
-        <Button>
-          <Link href={`/news/${newsId}`} passHref>
-            More
-          </Link>
-        </Button>
-        <div className="flex flex-row items-center">
-          <Button
-            variant="ghost"
-            className="right-0 top-0 h-full pl-5 pr-1 py-1 hover:bg-transparent text-black"
-            onClick={() => handleLike()}
-          >
-            {liked ? <FcLike size={30} /> : <PiHeart size={27} />}
-          </Button>
-          <p>{likes <= 0 ? null : likes}</p>
-        </div>
-      </CardFooter>
     </Card>
   );
 };

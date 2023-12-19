@@ -40,18 +40,27 @@ export default function Dashboard() {
           essence of Taylor Swift's ever-envolving narrative.
         </h3>
       </section>
+      <div className="container">
+        <h3 className="font-heading text-muted-foreground text-xl sm:text-xl md:text-2xl lg:text-3xl">
+          Trendings
+        </h3>
+      </div>
       <ScrollArea className="container">
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3 mb-10">
           <div className="flex flex-row gap-7">
-            {latest.map((item, i) => (
+            {latest.slice(0, 5).map((item, i) => (
               <LatestCard
                 key={i}
                 title={item.title}
                 desc={item.desc}
                 image={item.image}
-                isPrem={item.isPremium}
-                newsId={item.id}
-                likes={item.like}
+                isPremium={item.isPremium}
+                id={item.id}
+                like={item.like}
+                created_at={item.created_at}
+                updated_at={item.updated_at}
+                category={item.category}
+                share={item.share}
               />
             ))}
           </div>
@@ -59,22 +68,17 @@ export default function Dashboard() {
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
       <div className="container">
-        <div className="my-10">
-          <h3 className="font-heading text-xl sm:text-2xl md:text-3xl lg:text-4xl">
-            Most Likes{" "}
-          </h3>
-          <p className="max-w-[42rem] leading-normal text-muted-foreground sm:text-xl sm:leading-8">
-            Explore most favorite news
-          </p>
-        </div>
-        <div className="flex flex-col gap-7 my-10">
+        <h3 className="font-heading text-muted-foreground text-xl sm:text-xl md:text-2xl lg:text-3xl">
+          Latest News
+        </h3>
+        <div className="flex flex-col gap-7">
           {mostLike.map((item, i) => (
             <FavoriteCard
               key={i}
               title={item.title}
               desc={item.desc}
               image={item.image}
-              isPrem={item.isPremium}
+              isPremium={item.isPremium}
               newsId={item.id}
               likes={item.like}
             />
