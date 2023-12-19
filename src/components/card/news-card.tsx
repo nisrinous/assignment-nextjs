@@ -61,7 +61,21 @@ const NewsCard = (news: NewsData) => {
               {news.title}
             </a>
           </CardTitle>
-          <CardDescription className="mt-3">
+          <CardDescription className="mb-5">
+            {news.updated_at === ""
+              ? new Date(news.created_at).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })
+              : new Date(news.updated_at).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}{" "}
+            {news.like !== 0 ? "· " + news.like + " likes" : null}
+          </CardDescription>
+          <CardDescription className="w-5/6">
             {news.desc.substring(0, 200)}...
           </CardDescription>
         </CardContent>
