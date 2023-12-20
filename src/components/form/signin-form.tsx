@@ -18,6 +18,7 @@ import useSWR from "swr";
 import axios from "axios";
 import toast from "react-hot-toast";
 import router from "next/router";
+import Cookies from "universal-cookie";
 
 const Inputs = z.object({
   email: z
@@ -55,13 +56,15 @@ const SignInForm = () => {
       toast.error("" + error);
       return;
     }
-    if (data.length === 0) {
-      toast.error("Incorrect e-mail or password");
-      return;
-    }
+
     if (data && data.length > 0) {
       toast.success("User successfully signed in!");
-      router.push("/dashboard");
+
+      const cookies = new Cookies();
+      cookies.set("user-role", data[0].role, { path: "/" });
+      cookies.set("user-id", data[0].id, { path: "/" });
+
+      router.push("/");
     }
   }
 

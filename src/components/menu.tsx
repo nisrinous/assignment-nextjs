@@ -12,8 +12,17 @@ import Link from "next/link";
 import { CiUser } from "react-icons/ci";
 import { PiSparkleLight } from "react-icons/pi";
 import { IconContext } from "react-icons";
+import Cookies from "universal-cookie";
+import router from "next/router";
 
 const Menu = () => {
+  const logout = () => {
+    const cookies = new Cookies();
+    cookies.remove("user-role", { path: "/" });
+    cookies.remove("user-id", { path: "/" });
+    router.push("/auth/signin");
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -41,7 +50,7 @@ const Menu = () => {
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
-          <span>Log out</span>
+          <span onClick={() => logout()}>Log out</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

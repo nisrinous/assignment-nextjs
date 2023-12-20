@@ -15,15 +15,16 @@ import { z } from "zod";
 import axios from "axios";
 
 import useSWR from "swr";
-import { UserData } from "@/types";
 import toast from "react-hot-toast";
 import router from "next/router";
-import { useState } from "react";
 
 const Inputs = z
   .object({
     name: z.string().min(3, {
       message: "Name must be at least 3 characters",
+    }),
+    username: z.string().min(5, {
+      message: "Name must be at least 5 characters",
     }),
     email: z
       .string()
@@ -56,6 +57,7 @@ const SignUpForm = () => {
     resolver: zodResolver(Inputs),
     defaultValues: {
       name: "",
+      username: "",
       email: "",
       password: "",
       confirmpassword: "",
@@ -89,6 +91,7 @@ const SignUpForm = () => {
           role: "user",
           member: "basic",
           name: formData.name,
+          username: formData.username,
           email: formData.email,
           password: formData.password,
           address: formData.address,
