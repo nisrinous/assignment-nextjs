@@ -51,7 +51,7 @@ const SignInForm = () => {
     }
   );
 
-  function onSubmit(formData: z.infer<typeof Inputs>) {
+  function onSubmit() {
     if (error) {
       toast.error("" + error);
       return;
@@ -63,6 +63,7 @@ const SignInForm = () => {
       const cookies = new Cookies();
       cookies.set("user-role", data[0].role, { path: "/" });
       cookies.set("user-id", data[0].id, { path: "/" });
+      cookies.set("user-membership", data[0].member, { path: "/" });
 
       router.push("/");
     }

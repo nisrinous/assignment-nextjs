@@ -15,8 +15,10 @@ import { z } from "zod";
 import axios from "axios";
 
 import useSWR from "swr";
+import { UserData } from "@/types";
 import toast from "react-hot-toast";
 import router from "next/router";
+import { useState } from "react";
 
 const Inputs = z
   .object({
@@ -133,6 +135,19 @@ const SignUpForm = () => {
           />
           <FormField
             control={form.control}
+            name="username"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Username</FormLabel>
+                <FormControl>
+                  <Input type="text" placeholder="Username" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
             name="email"
             render={({ field }) => (
               <FormItem>
@@ -190,7 +205,7 @@ const SignUpForm = () => {
               <FormItem>
                 <FormLabel>Phone Number</FormLabel>
                 <FormControl>
-                  <Input type="text" placeholder="08123456777" {...field} />
+                  <Input type="text" placeholder="08..." {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
