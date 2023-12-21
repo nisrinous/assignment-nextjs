@@ -11,18 +11,12 @@ import { ArrowUpDown } from "lucide-react";
 
 export default function Dashboard() {
   const [newsData, setNewsdata] = useState<NewsData[]>([]);
-  const [mostLike, setMostLike] = useState<NewsData[]>([]);
   const [sort, setSort] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   const fetcher = useSWR("http://localhost:9000/news", async (url) => {
     const response = await axios.get(url);
     setNewsdata(response.data);
-
-    const sortOnLike = newsData.sort((current, next) => {
-      return next.like - current.like;
-    });
-    setMostLike(sortOnLike);
   });
 
   const filteredNews = newsData.filter((item) =>
@@ -47,22 +41,27 @@ export default function Dashboard() {
       <ScrollArea className="container">
         <div className="flex flex-col gap-3 mb-10">
           <div className="flex flex-row gap-7">
-            {mostLike.slice(0, 5).map((item, i) => (
-              <TrendingCard
-                key={i}
-                title={item.title}
-                desc={item.desc}
-                image={item.image}
-                isPremium={item.isPremium}
-                id={item.id}
-                like={item.like}
-                created_at={item.created_at}
-                updated_at={item.updated_at}
-                category={item.category}
-                share={item.share}
-                likers={item.likers}
-              />
-            ))}
+            {newsData
+              .sort((current, next) => {
+                return next.like - current.like;
+              })
+              .slice(0, 5)
+              .map((item, i) => (
+                <TrendingCard
+                  key={i}
+                  title={item.title}
+                  desc={item.desc}
+                  image={item.image}
+                  isPremium={item.isPremium}
+                  id={item.id}
+                  like={item.like}
+                  created_at={item.created_at}
+                  updated_at={item.updated_at}
+                  category={item.category}
+                  share={item.share}
+                  likers={item.likers}
+                />
+              ))}
           </div>
         </div>
         <ScrollBar orientation="horizontal" />

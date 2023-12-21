@@ -21,16 +21,18 @@ import {
 } from "@/components/ui/dialog";
 import { RootState } from "@/store/store";
 import { useSelector } from "react-redux";
-import { number } from "zod";
+import NewsCard from "@/components/card/news-card";
 
 export default function Details() {
   const router = useRouter();
   const { id: newsId } = router.query;
   const { membership, id } = useSelector((state: RootState) => state.user);
   const [hearted, setHearted] = useState<boolean>();
+  const [newsData, setNewsdata] = useState<NewsData[]>([]);
 
   let filteredliked: number[] = [];
   let filteredlikers: number[] = [];
+  let history: number[] = [];
 
   const [news, setNews] = useState<NewsData>({
     id: "",
@@ -58,6 +60,7 @@ export default function Details() {
     referral: "",
     liked: [],
     expired_subs: "",
+    history: [],
   });
 
   const { data: dataNews, mutate: mutateNews } = useSWR(
@@ -77,6 +80,13 @@ export default function Details() {
     }
   );
 
+  const fetcher = useSWR("http://localhost:9000/news", async (url) => {
+    const response = await axios.get(url);
+    setNewsdata(response.data);
+  });
+
+  fetcher;
+
   const handleLike = async () => {
     try {
       if (hearted && news.like > 0) {
@@ -86,23 +96,27 @@ export default function Details() {
         filteredlikers = news.likers.filter((item) => {
           return item !== Number(id);
         });
+        history = userData.history;
         await axios.patch(`http://localhost:9000/news/${newsId}`, {
           like: news.like - 1,
           likers: filteredlikers,
         });
         await axios.patch(`http://localhost:9000/users/${id}`, {
           liked: filteredliked,
+          history: history,
         });
       }
       if (!hearted) {
         userData.liked.push(Number(newsId));
         news.likers.push(Number(id));
+        userData.history.push(Number(newsId));
         await axios.patch(`http://localhost:9000/news/${newsId}`, {
           like: news.like + 1,
           likers: news.likers,
         });
         await axios.patch(`http://localhost:9000/users/${id}`, {
           liked: userData.liked,
+          history: userData.history,
         });
       }
       setHearted((prev) => !prev);
@@ -120,7 +134,6 @@ export default function Details() {
       await axios.patch(`http://localhost:9000/news/${newsId}`, {
         share: news.share + 1,
       });
-      console.log(news.share + 1);
       mutateNews();
     } catch (error) {
       console.log(error);
@@ -222,6 +235,31 @@ export default function Details() {
         </div>
 
         <h3 className="leading-normal sm:text-xl sm:leading-8">{news.desc}</h3>
+      </div>
+      <div className="container my-40 justify-center items-center">
+        <h3 className="font-heading text-muted-foreground text-xl sm:text-xl md:text-2xl mt-10 mb-5 border-b-[1px] border-white">
+          Recommendations
+        </h3>
+        <div className="flex flex-row gap-7">
+          {newsData
+            .filter((item) => item.category.toLowerCase() === news.category)
+            .map((item, i) => (
+              <NewsCard
+                key={i}
+                title={item.title}
+                desc={item.desc}
+                image={item.image}
+                isPremium={item.isPremium}
+                id={item.id}
+                like={item.like}
+                created_at={item.created_at}
+                updated_at={item.updated_at}
+                category={item.category}
+                share={item.share}
+                likers={item.likers}
+              />
+            ))}
+        </div>
       </div>
     </div>
   );

@@ -98,6 +98,7 @@ const SignUpForm = () => {
           phonenumber: formData.phonenumber,
           referral: formData.referral,
           liked: [],
+          history: [],
           expired_subs: "",
         });
         if (response.data) {

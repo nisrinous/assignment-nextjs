@@ -10,6 +10,7 @@ export type UserData = {
   phonenumber: string;
   referral: string;
   liked: number[];
+  history: number[];
   expired_subs: string;
 };
 
