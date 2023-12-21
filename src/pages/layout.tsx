@@ -18,15 +18,14 @@ export default function Layout({ children }: Layout) {
   return (
     <>
       <Header />
-      {isAdminPage ||
-        (isUserPage && (
-          <div className="bg-white bg-opacity-70">
-            <div className="container flex flex-row">
-              <Aside />
-              {children}
-            </div>
+      {(isAdminPage || isUserPage) && (
+        <div className="bg-white bg-opacity-70">
+          <div className="container flex flex-row">
+            <Aside />
+            {children}
           </div>
-        ))}
+        </div>
+      )}
       {!isAdminPage && !isUserPage && <div>{children}</div>}
       <Footer />
     </>

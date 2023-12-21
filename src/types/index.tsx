@@ -40,7 +40,7 @@ export type TransactionData = {
   id: number;
   user: string;
   type: 1 | 12;
-  transaction_date: string;
+  created_at: string;
   status: "processing" | "completed" | "canceled";
   transaction_completed_date: string;
   total_paid: 9 | 99;
