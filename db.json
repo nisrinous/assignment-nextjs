@@ -1,7 +1,7 @@
 {
   "users": [
     {
-      "id": 1,
+      "id": 0,
       "role": "admin",
       "membership": "basic",
       "name": "Nur",
@@ -11,16 +11,17 @@
       "address": "Jl. MH. Thamrin No. 88, Kaur, JT 47316",
       "phonenumber": "0812121315",
       "referral": "",
-      "like": [
+      "liked": [
         1,
         2
       ],
+      "history": [],
       "expired_subs": ""
     },
     {
-      "id": 2,
+      "id": 1,
       "role": "user",
-      "membership": "premium",
+      "membership": "basic",
       "name": "Acong",
       "username": "acongacong",
       "email": "acong@mail.com",
@@ -28,15 +29,16 @@
       "address": "Jl. Rasuna Said No. 31, Ambon, SM 75689",
       "phonenumber": "0815220000",
       "referral": "",
-      "like": [
+      "liked": [
         3
       ],
-      "expired_subs": "2024-12-13T08:39:45.475Z"
+      "history": [],
+      "expired_subs": ""
     },
     {
-      "id": 3,
+      "id": 2,
       "role": "user",
-      "membership": "premium",
+      "membership": "basic",
       "name": "huhu",
       "username": "huhuhuhu",
       "email": "huhu@mail.com",
@@ -44,8 +46,14 @@
       "address": "Jalan Tugu No. 20",
       "phonenumber": "081765432121",
       "referral": "",
-      "like": [],
-      "expired_subs": "2024-01-18T08:59:58.373Z"
+      "liked": [
+        1
+      ],
+      "history": [
+        13,
+        4
+      ],
+      "expired_subs": ""
     },
     {
       "role": "user",
@@ -57,23 +65,25 @@
       "address": "Jalan Tugu No. 20",
       "phonenumber": "081765432121",
       "referral": "",
-      "like": [],
+      "liked": [],
+      "history": [],
       "expired_subs": "",
-      "id": 4
+      "id": 3
     },
     {
       "role": "user",
       "name": "Nur Nisrina",
       "username": "nurnisrina",
-      "membership": "basic",
+      "membership": "premium",
       "email": "nisrina.ningrum@shopee.com",
       "password": "mew",
       "address": "Jalan Tugu No. 20",
       "phonenumber": "081765432121",
       "referral": "",
-      "like": [],
-      "expired_subs": "",
-      "id": 5
+      "liked": [],
+      "history": [],
+      "expired_subs": "2024-02-20T08:00:59.320Z",
+      "id": 4
     },
     {
       "role": "user",
@@ -85,22 +95,26 @@
       "address": "Kuningan Raya",
       "phonenumber": "089713242577",
       "referral": "acong@mail.com",
-      "like": [],
+      "liked": [],
+      "history": [],
       "expired_subs": "",
-      "id": 6
+      "id": 5
     }
   ],
   "news": [
     {
       "id": 1,
-      "isPremium": true,
+      "isPremium": false,
       "title": "Taylor Swift is Time's Person of the Year",
       "desc": "Taylor Swift was named Time's Person of the Year. A well-deserved title, and it may have been more powerful of a statement if she was named Person of the Decade. Historically, for a woman to earn this distinction from Time Magazine, she has had to be either truly exceptional or deeply controversial. A prime example is Wallis Simpson, named Time’s Woman of the Year in 1936 after her involvement in the abdication of the British throne. In a list where you also find Donald Trump and Hitler, it’s a list that had long overlooked women in history. Golda Meir, Indira Gandhi, and Margaret Thatcher never made it. This year was a remarkable year for Taylor Swift. The Eras Tour became the highest-grossing tour in a single year. Between her and Beyonce, their tours grossed $1.5 billion. Taylor Swift takes the honor of bringing economic boom wherever she had a show. She is a cultural phenomenon and her global reach hasn't been seen in decades. She keeps on breaking records, and if there is still a glass ceiling that no female artist has yet to break, it won't come as much of a surprise if Taylor Swift's name will soon be attached to that record.",
       "image": "https://res.cloudinary.com/minevf/image/upload/v1702976375/Taylor-Swift-1989-Taylors-Version_hs6olc.webp",
       "created_at": "Tue Dec 12 2023 15:12:13 GMT+0700 (Western Indonesia Time)",
       "updated_at": "Tue Dec 19 2023 15:59:40 GMT+0700 (Western Indonesia Time)",
       "category": "entertainment",
-      "like": 151,
+      "like": 141,
+      "likers": [
+        2
+      ],
       "share": 0
     },
     {
@@ -113,6 +127,7 @@
       "updated_at": "Fri Dec 15 2023 16:35:19 GMT+0700 (Western Indonesia Time)",
       "category": "technology",
       "like": 80,
+      "likers": [],
       "share": 2
     },
     {
@@ -137,6 +152,7 @@
       "updated_at": "",
       "category": "concert",
       "like": 71,
+      "likers": [],
       "share": 2
     },
     {
@@ -149,6 +165,7 @@
       "updated_at": "",
       "category": "world",
       "like": 13,
+      "likers": [],
       "share": 0
     },
     {
@@ -160,6 +177,7 @@
       "updated_at": "",
       "category": "music",
       "like": 0,
+      "likers": [],
       "id": 6,
       "share": 0
     },
@@ -173,6 +191,7 @@
       "category": "world",
       "like": 1,
       "id": 8,
+      "likers": [],
       "share": 0
     },
     {
@@ -184,6 +203,7 @@
       "updated_at": "",
       "category": "world",
       "like": 2,
+      "likers": [],
       "id": 9,
       "share": 0
     },
@@ -196,6 +216,7 @@
       "updated_at": "",
       "category": "music",
       "like": 0,
+      "likers": [],
       "id": 10,
       "share": 0
     },
@@ -208,6 +229,7 @@
       "updated_at": "",
       "category": "entertainment",
       "like": 0,
+      "likers": [],
       "id": 11,
       "share": 0
     },
@@ -220,6 +242,7 @@
       "updated_at": "",
       "category": "world",
       "like": 0,
+      "likers": [],
       "id": 12,
       "share": 0
     },
@@ -232,33 +255,29 @@
       "created_at": "Fri Dec 15 2023 15:29:29 GMT+0700 (Western Indonesia Time)",
       "updated_at": "",
       "like": 0,
+      "likers": [],
       "id": 13,
       "share": 0
     }
   ],
-  "admins": [
-    {
-      "email": "admin@mail.com"
-    }
-  ],
   "transactions": [
     {
-      "id": 1,
-      "user": "acong@mail.com",
-      "type": 12,
-      "transaction_date": "2023-01-05",
+      "user": "nisrina.ningrum@shopee.com",
+      "type": 1,
+      "created_at": "2023-12-21T07:10:32.064Z",
+      "updated_at": "2023-12-21T08:00:59.289Z",
       "status": "completed",
-      "transaction_updated_date": "2023-12-19T08:39:45.431Z",
-      "total_paid": 99
+      "total_paid": 9,
+      "id": 1
     },
     {
-      "id": 2,
-      "user": "huhu@mail.com",
+      "user": "nisrina.ningrum@shopee.com",
       "type": 1,
-      "transaction_date": "2023-01-10",
+      "created_at": "2023-12-21T08:01:57.324Z",
+      "updated_at": "2023-12-21T08:22:51.994Z",
       "status": "completed",
-      "transaction_updated_date": "2023-12-19T08:59:58.341Z",
-      "total_paid": 9
+      "total_paid": 9,
+      "id": 2
     }
   ]
 }

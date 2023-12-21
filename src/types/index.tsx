@@ -39,11 +39,11 @@ export type NewsDetail = {
 };
 
 export type TransactionData = {
-  id: number;
+  id: string;
   user: string;
   type: 1 | 12;
   created_at: string;
   status: "processing" | "completed" | "canceled";
-  transaction_completed_date: string;
+  updated_at: string;
   total_paid: 9 | 99;
 };

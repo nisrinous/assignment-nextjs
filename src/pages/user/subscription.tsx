@@ -25,7 +25,7 @@ import { useState } from "react";
 import { IconContext } from "react-icons";
 import { FaCheck } from "react-icons/fa6";
 import { useSelector } from "react-redux";
-import useSWR from "swr";
+import QRCode from "react-qr-code";
 
 export default function Subscription() {
   const [onSubs, setOnSubs] = useState<boolean>(false);
@@ -180,36 +180,28 @@ export default function Subscription() {
             <DialogTrigger asChild>
               <Button>Payment Details</Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[425px] flex flex-col justify-center items-center">
               <DialogHeader>
                 <DialogTitle className="text-3xl mb-5">Payment</DialogTitle>
                 <DialogDescription className="text-base">
-                  <div className="flex flex-col p-3 gap-2">
-                    <h3 className="text-3xl mb-3">Yearly Subscription</h3>
-                    <div className="flex flex-row justify-between">
-                      <p className="text-muted-foreground">Subtotal</p>
-                      <p className="text-muted-foreground">
-                        ${type === "for a year" ? 99 : 9}
-                      </p>
-                    </div>
-                    <div className="flex flex-row justify-between border-b-2 border-gray-500">
-                      <p className="text-muted-foreground">Tax</p>
-                      <p className="text-muted-foreground pb-1">$0.7</p>
-                    </div>
-                    <div className="flex flex-row justify-between my-5">
-                      <p className="text-muted-foreground font-bold">Total</p>
-                      <p className="text-muted-foreground">
-                        ${type === "for a year" ? 99.7 : 9.7}
-                      </p>
-                    </div>
-                  </div>
+                  <QRCode
+                    size={256}
+                    style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                    value={`http://10.20.191.32:3000/payment`}
+                    viewBox={`0 0 256 256`}
+                  />
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
                 <DialogClose>
-                  <Button type="button" onClick={() => activateSubscription()}>
-                    Place my order
-                  </Button>
+                  <div className="my-10">
+                    <Button
+                      type="button"
+                      onClick={() => activateSubscription()}
+                    >
+                      I have completed the payment
+                    </Button>
+                  </div>
                 </DialogClose>
               </DialogFooter>
             </DialogContent>

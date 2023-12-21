@@ -14,6 +14,7 @@ export default function Layout({ children }: Layout) {
 
   if (router.pathname.includes("/auth/signin")) return children;
   if (router.pathname.includes("/auth/signup")) return children;
+  if (router.pathname.includes("/payment")) return children;
 
   return (
     <>
