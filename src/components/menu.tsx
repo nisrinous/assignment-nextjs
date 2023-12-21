@@ -15,13 +15,15 @@ import { IconContext } from "react-icons";
 import Cookies from "js-cookie";
 
 import router from "next/router";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setAttribute } from "@/store/slices/userSlice";
 import { useEffect } from "react";
+import { RootState } from "@/store/store";
 
 const Menu = () => {
   const dispatch = useDispatch();
   const token = Cookies.get("authToken");
+  const { role } = useSelector((state: RootState) => state.user);
 
   const logout = () => {
     Cookies.remove("user-role", { path: "/" });
@@ -56,16 +58,21 @@ const Menu = () => {
         <DropdownMenuSeparator />
         <DropdownMenuGroup className="text-right">
           <DropdownMenuItem>
-            <Link href="/user">
+            <Link href={`${role === "admin" ? "/admin" : "/user"}`}>
               <span>Profile</span>
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem>
+          <DropdownMenuItem className={`${role === "admin" ? "hidden" : null}`}>
             <Link href="/user/subscription" className="flex flex-row">
-              <span>Premium </span>
-              <IconContext.Provider value={{ color: "yellow" }}>
+              <span>Premium</span>
+              <IconContext.Provider value={{ color: "orange" }}>
                 <PiSparkleLight />
               </IconContext.Provider>
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem className={`${role !== "admin" ? "hidden" : null}`}>
+            <Link href="/admin/news">
+              <span>News Store</span>
             </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
