@@ -13,6 +13,7 @@ export default function Dashboard() {
   const [newsData, setNewsdata] = useState<NewsData[]>([]);
   const [mostLike, setMostLike] = useState<NewsData[]>([]);
   const [sort, setSort] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   const fetcher = useSWR("http://localhost:9000/news", async (url) => {
     const response = await axios.get(url);
@@ -24,13 +25,24 @@ export default function Dashboard() {
     setMostLike(sortOnLike);
   });
 
+  const filteredNews = newsData.filter((item) =>
+    item.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <>
       <Hero />
-      <div className="container">
+      <div className="container flex flex-row justify-between">
         <h3 className="font-heading text-muted-foreground text-xl sm:text-xl md:text-2xl lg:text-3xl">
           Trendings
         </h3>
+        <input
+          type="text"
+          placeholder="Search news..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="border border-gray-300 rounded-md px-3 py-2 mb-5"
+        />
       </div>
       <ScrollArea className="container">
         <div className="flex flex-col gap-3 mb-10">
@@ -48,13 +60,14 @@ export default function Dashboard() {
                 updated_at={item.updated_at}
                 category={item.category}
                 share={item.share}
+                likers={item.likers}
               />
             ))}
           </div>
         </div>
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
-      <div className="container">
+      <div className={`${searchQuery === "" ? "news container" : "hidden"}`}>
         <div className="flex flex-col md:flex-row gap-10 mb-10">
           <Tabs
             defaultValue="all"
@@ -101,6 +114,7 @@ export default function Dashboard() {
                       updated_at={item.updated_at}
                       category={item.category}
                       share={item.share}
+                      likers={item.likers}
                     />
                   ))}
               </div>
@@ -122,6 +136,7 @@ export default function Dashboard() {
                       updated_at={item.updated_at}
                       category={item.category}
                       share={item.share}
+                      likers={item.likers}
                     />
                   ))}
               </div>
@@ -153,6 +168,7 @@ export default function Dashboard() {
                       updated_at={item.updated_at}
                       category={item.category}
                       share={item.share}
+                      likers={item.likers}
                     />
                   ))}
               </div>
@@ -176,6 +192,7 @@ export default function Dashboard() {
                       updated_at={item.updated_at}
                       category={item.category}
                       share={item.share}
+                      likers={item.likers}
                     />
                   ))}
               </div>
@@ -197,12 +214,53 @@ export default function Dashboard() {
                       updated_at={item.updated_at}
                       category={item.category}
                       share={item.share}
+                      likers={item.likers}
                     />
                   ))}
               </div>
             </TabsContent>
           </Tabs>
         </div>
+      </div>
+      <div className={`${searchQuery !== "" ? "news container" : "hidden"}`}>
+        {filteredNews.length > 0 ? (
+          <>
+            <div>
+              <h3 className="text-muted-foreground text-xl">Search result:</h3>
+            </div>
+
+            <div className="flex flex-col gap-7">
+              {filteredNews
+                .sort((current, next) =>
+                  sort
+                    ? Date.parse(current.updated_at) -
+                      Date.parse(next.updated_at)
+                    : Date.parse(next.updated_at) -
+                      Date.parse(current.updated_at)
+                )
+                .map((item, i) => (
+                  <NewsCard
+                    key={i}
+                    title={item.title}
+                    desc={item.desc}
+                    image={item.image}
+                    isPremium={item.isPremium}
+                    id={item.id}
+                    like={item.like}
+                    created_at={item.created_at}
+                    updated_at={item.updated_at}
+                    category={item.category}
+                    share={item.share}
+                    likers={item.likers}
+                  />
+                ))}
+            </div>
+          </>
+        ) : (
+          <div>
+            <h3 className="text-muted-foreground text-xl">No result</h3>
+          </div>
+        )}
       </div>
     </>
   );

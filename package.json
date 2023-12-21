@@ -27,6 +27,7 @@
     "class-variance-authority": "^0.7.0",
     "cloudinary": "^1.41.0",
     "clsx": "^2.0.0",
+    "date-fns": "^3.0.4",
     "js-cookie": "^3.0.5",
     "json-server": "^0.17.4",
     "lucide-react": "^0.294.0",

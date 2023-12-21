@@ -15,10 +15,8 @@ import { z } from "zod";
 import axios from "axios";
 
 import useSWR from "swr";
-import { UserData } from "@/types";
 import toast from "react-hot-toast";
 import router from "next/router";
-import { useState } from "react";
 
 const Inputs = z
   .object({
