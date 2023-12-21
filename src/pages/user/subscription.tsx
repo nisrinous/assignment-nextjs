@@ -186,7 +186,7 @@ export default function Subscription() {
                   <QRCode
                     size={256}
                     style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-                    value={`http://10.20.191.32:3000/payment`}
+                    value={`https://drearymonday.vercel.app/payment`}
                     viewBox={`0 0 256 256`}
                   />
                 </DialogDescription>
