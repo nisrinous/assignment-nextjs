@@ -64,7 +64,7 @@ function TransactionTable() {
     try {
       await axios.patch(`http://localhost:9000/transactions/${transactionId}`, {
         status: status,
-        transaction_updated_date: new Date(),
+        updated_at: new Date(),
       });
 
       if (status === "completed") {

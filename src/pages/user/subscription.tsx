@@ -26,7 +26,6 @@ import { IconContext } from "react-icons";
 import { FaCheck } from "react-icons/fa6";
 import { useSelector } from "react-redux";
 import useSWR from "swr";
-import Cookies from "js-cookie";
 
 export default function Subscription() {
   const [onSubs, setOnSubs] = useState<boolean>(false);
@@ -50,19 +49,19 @@ export default function Subscription() {
       await axios
         .get(`http://localhost:9000/users/${id}`)
         .then((response) => {
-          let previousDate = response.data.expired_subs;
-          console.log(previousDate);
-          const millisecondsInADay = 1000 * 60 * 60 * 24;
+          const data = response.data;
+          let previousDate = data.expired_subs;
           if (previousDate === "") {
             previousDate = new Date();
           }
-          Cookies.set("user-membership", "premium", { path: "/" });
 
-          return axios.patch(`http://localhost:9000/users/${id}`, {
-            membership: "premium",
-            expired_subs: new Date(
-              previousDate.getTime() + millisecondsInADay * 30 * months
-            ),
+          return axios.post("http://localhost:9000/transactions", {
+            user: data.email,
+            type: months,
+            created_at: new Date(),
+            updated_at: "",
+            status: "processing",
+            total_paid: months == 1 ? 9 : 99,
           });
         })
         .catch((error) => {
