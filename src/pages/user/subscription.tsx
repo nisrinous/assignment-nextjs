@@ -50,10 +50,6 @@ export default function Subscription() {
         .get(`http://localhost:9000/users/${id}`)
         .then((response) => {
           const data = response.data;
-          let previousDate = data.expired_subs;
-          if (previousDate === "") {
-            previousDate = new Date();
-          }
 
           return axios.post("http://localhost:9000/transactions", {
             user: data.email,

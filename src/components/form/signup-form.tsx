@@ -99,7 +99,7 @@ const SignUpForm = () => {
           address: formData.address,
           phonenumber: formData.phonenumber,
           referral: formData.referral,
-          like: [],
+          liked: [],
           expired_subs: "",
         });
         if (response.data) {

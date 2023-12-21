@@ -38,7 +38,6 @@ import { UserData } from "@/types";
 import { useState } from "react";
 import axios from "axios";
 import useSWR from "swr";
-import Cookies from "js-cookie";
 
 function SubscriptionTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -61,7 +60,6 @@ function SubscriptionTable() {
       await axios.patch(`http://localhost:9000/users/${userId}`, {
         membership: "basic",
       });
-      Cookies.set("user-membership", "member", { path: "/" });
       mutate();
     } catch (error) {
       console.error(error);

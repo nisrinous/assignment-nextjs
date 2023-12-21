@@ -9,7 +9,7 @@ export type UserData = {
   address: string;
   phonenumber: string;
   referral: string;
-  like: number[];
+  liked: number[];
   expired_subs: string;
 };
 
@@ -23,6 +23,7 @@ export type NewsData = {
   updated_at: string;
   category: string;
   like: number;
+  likers: number[];
   share: number;
 };
 

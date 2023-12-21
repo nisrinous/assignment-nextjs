@@ -39,6 +39,7 @@ import { TransactionData } from "@/types";
 import { useState } from "react";
 import axios from "axios";
 import useSWR from "swr";
+import { parseISO, addMonths } from "date-fns";
 
 function TransactionTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -74,17 +75,17 @@ function TransactionTable() {
           .get(`http://localhost:9000/users?email=${email}`)
           .then((response) => {
             let previousDate = response.data[0].expired_subs;
-            const millisecondsInADay = 1000 * 60 * 60 * 24;
+            console.log(previousDate);
             if (previousDate === "") {
               previousDate = new Date();
             }
+            const newExpireDate = addMonths(new Date(previousDate), type);
+            console.log(newExpireDate);
             return axios.patch(
               `http://localhost:9000/users/${response.data[0].id}`,
               {
                 membership: "premium",
-                expired_subs: new Date(
-                  previousDate.getTime() + millisecondsInADay * 30 * type
-                ),
+                expired_subs: newExpireDate,
               }
             );
           })
@@ -160,7 +161,7 @@ function TransactionTable() {
               <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                   <DialogTitle className="text-3xl">
-                    Complete transaction?
+                    Complete Transaction
                   </DialogTitle>
                   <DialogDescription className="text-base">
                     Complete this transaction? <br />
@@ -168,15 +169,7 @@ function TransactionTable() {
                   </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
-                  <DialogClose>
-                    <Button
-                      type="button"
-                      onClick={() =>
-                        handleTransactionStatus(row.getValue("id"), "canceled")
-                      }
-                    >
-                      Cancel
-                    </Button>
+                  <DialogClose className="flex flex-row gap-3">
                     <Button
                       type="button"
                       onClick={() =>
@@ -231,9 +224,9 @@ function TransactionTable() {
   return (
     <div className="w-full p-10 bg-white">
       <div className="my-10 flex-col text-center">
-        <h1 className="font-heading text-xl md:text-3xl">Subscriptions</h1>
+        <h1 className="font-heading text-xl md:text-3xl">Transactions</h1>
         <h3 className="leading-tight text-muted-foreground sm:text-xl sm:leading-8">
-          Manage subscribers
+          Manage transactions
         </h3>
       </div>
       <div className="w-full">

@@ -88,6 +88,7 @@ const AddNewsForm = () => {
         created_at: new Date().toString(),
         updated_at: "",
         like: 0,
+        likers: [],
       });
       if (response.data) {
         toast.success("News added successfully!");
