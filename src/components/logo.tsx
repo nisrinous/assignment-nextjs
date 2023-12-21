@@ -7,7 +7,7 @@ const Logo = () => {
         className="w-[300px] h-[90px]"
         version="1.0"
         xmlns="http://www.w3.org/2000/svg"
-        width="5 54"
+        width="554"
         height="131"
         viewBox="0 0 554 131"
         preserveAspectRatio="xMidYMid meet"

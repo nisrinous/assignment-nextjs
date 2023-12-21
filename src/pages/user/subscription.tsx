@@ -18,7 +18,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { RootState } from "@/store/store";
-import { UserData } from "@/types";
 import axios from "axios";
 import router from "next/router";
 import { useState } from "react";

@@ -39,7 +39,7 @@ import { TransactionData } from "@/types";
 import { useState } from "react";
 import axios from "axios";
 import useSWR from "swr";
-import { parseISO, addMonths } from "date-fns";
+import { addMonths } from "date-fns";
 
 function TransactionTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
