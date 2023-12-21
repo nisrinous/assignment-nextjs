@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { NewsData } from "@/types";
+import { NewsData, UserData } from "@/types";
 import axios from "axios";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useSWR from "swr";
-import { PiHeart } from "react-icons/pi";
+import { PiHeart, PiVanLight } from "react-icons/pi";
 import { FcLike } from "react-icons/fc";
 import { PiSparkleLight, PiShareFatLight } from "react-icons/pi";
 import { IconContext } from "react-icons";
@@ -21,9 +21,17 @@ import {
 } from "@/components/ui/dialog";
 import { RootState } from "@/store/store";
 import { useSelector } from "react-redux";
+import { number } from "zod";
 
 export default function Details() {
   const router = useRouter();
+  const { id: newsId } = router.query;
+  const { membership, id } = useSelector((state: RootState) => state.user);
+  const [hearted, setHearted] = useState<boolean>();
+
+  let filteredliked: number[] = [];
+  let filteredlikers: number[] = [];
+
   const [news, setNews] = useState<NewsData>({
     id: "",
     isPremium: false,
@@ -35,32 +43,72 @@ export default function Details() {
     category: "",
     like: 0,
     share: 0,
+    likers: [],
   });
-  const { id } = router.query;
-  const { membership } = useSelector((state: RootState) => state.user);
+  const [userData, setUserData] = useState<UserData>({
+    id: "",
+    role: "user",
+    membership: "basic",
+    name: "",
+    username: "",
+    email: "",
+    password: "",
+    address: "",
+    phonenumber: "",
+    referral: "",
+    liked: [],
+    expired_subs: "",
+  });
 
-  const { data, mutate } = useSWR(
-    `http://localhost:9000/news/${id}`,
+  const { data: dataNews, mutate: mutateNews } = useSWR(
+    `http://localhost:9000/news/${newsId}`,
     async (url) => {
       const response = await axios.get(url);
       setNews(response.data);
     }
   );
+  const { data: dataUSer, mutate: mutateUser } = useSWR(
+    `http://localhost:9000/users/${id}`,
+    async (url) => {
+      const response = await axios.get(url);
+      setUserData(response.data);
+      mutateUser();
+      setHearted(userData.liked.some((item) => item === Number(newsId)));
+    }
+  );
 
   const handleLike = async () => {
     try {
-      if (liked && news.like > 0) {
-        await axios.patch(`http://localhost:9000/news/${id}`, {
+      if (hearted && news.like > 0) {
+        filteredliked = userData.liked.filter((item) => {
+          return item !== Number(newsId);
+        });
+        filteredlikers = news.likers.filter((item) => {
+          return item !== Number(id);
+        });
+        await axios.patch(`http://localhost:9000/news/${newsId}`, {
           like: news.like - 1,
+          likers: filteredlikers,
+        });
+        await axios.patch(`http://localhost:9000/users/${id}`, {
+          liked: filteredliked,
         });
       }
-      if (!liked) {
-        await axios.patch(`http://localhost:9000/news/${id}`, {
+      if (!hearted) {
+        userData.liked.push(Number(newsId));
+        news.likers.push(Number(id));
+        await axios.patch(`http://localhost:9000/news/${newsId}`, {
           like: news.like + 1,
+          likers: news.likers,
+        });
+        await axios.patch(`http://localhost:9000/users/${id}`, {
+          liked: userData.liked,
         });
       }
-      setLiked((prev) => !prev);
-      mutate();
+      setHearted((prev) => !prev);
+
+      mutateNews();
+      mutateUser();
     } catch (error) {
       console.log(error);
     }
@@ -69,17 +117,15 @@ export default function Details() {
   const handleShare = async () => {
     try {
       console.log(news.share);
-      await axios.patch(`http://localhost:9000/news/${id}`, {
+      await axios.patch(`http://localhost:9000/news/${newsId}`, {
         share: news.share + 1,
       });
       console.log(news.share + 1);
-      mutate();
+      mutateNews();
     } catch (error) {
       console.log(error);
     }
   };
-  const [liked, setLiked] = useState<boolean>();
-  console.log(membership);
 
   return (
     <div className="relative">
@@ -142,7 +188,7 @@ export default function Details() {
                 className="hover:bg-transparent p-0"
                 onClick={() => handleLike()}
               >
-                {liked ? <FcLike size={30} /> : <PiHeart size={27} />}
+                {hearted ? <FcLike size={30} /> : <PiHeart size={27} />}
               </Button>
               <p>{news.like <= 0 ? null : news.like}</p>
             </div>

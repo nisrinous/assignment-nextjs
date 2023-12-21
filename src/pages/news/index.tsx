@@ -28,7 +28,7 @@ export default function Dashboard() {
   const filteredNews = newsData.filter((item) =>
     item.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
+  fetcher;
   return (
     <>
       <Hero />
