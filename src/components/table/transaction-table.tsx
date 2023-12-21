@@ -39,6 +39,7 @@ import { TransactionData } from "@/types";
 import { useState } from "react";
 import axios from "axios";
 import useSWR from "swr";
+import Cookies from "js-cookie";
 
 function TransactionTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -78,6 +79,10 @@ function TransactionTable() {
             if (previousDate === "") {
               previousDate = new Date();
             }
+            Cookies.set("user-membership", "premium", {
+              path: "/",
+            });
+
             return axios.patch(
               `http://localhost:9000/users/${response.data[0].id}`,
               {

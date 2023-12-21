@@ -79,6 +79,7 @@ export default function Details() {
     }
   };
   const [liked, setLiked] = useState<boolean>();
+  console.log(membership);
 
   return (
     <div className="relative">

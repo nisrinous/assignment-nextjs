@@ -17,46 +17,58 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { RootState } from "@/store/store";
 import { UserData } from "@/types";
 import axios from "axios";
+import router from "next/router";
 import { useState } from "react";
+import { IconContext } from "react-icons";
 import { FaCheck } from "react-icons/fa6";
+import { useSelector } from "react-redux";
 import useSWR from "swr";
+import Cookies from "js-cookie";
 
 export default function Subscription() {
   const [onSubs, setOnSubs] = useState<boolean>(false);
-  const [type, setType] = useState<number>();
-  const [user, setUser] = useState<UserData>();
+  const [type, setType] = useState<string>();
+  const { id } = useSelector((state: RootState) => state.user);
 
-  const handleSubscription = (type: number) => {
+  const handleSubscription = (type: string) => {
     setOnSubs(true);
     setType(type);
   };
 
-  const { data, mutate } = useSWR(
-    "http://localhost:9000/users/2",
-    async (url) => {
-      const response = await axios.get(url);
-      const fetchedUser: UserData = response.data;
-      setUser(fetchedUser);
+  const activateSubscription = async () => {
+    let months = 0;
+    if (type === "for a month") {
+      months = 1;
+    } else {
+      months = 12;
     }
-  );
-
-  const activateSubscription = async (userId: string, type: number) => {
+    console.log(months);
     try {
-      let previousDate = user?.expired_subs;
-      const millisecondsInADay = 1000 * 60 * 60 * 24;
-      if (previousDate === "") {
-        previousDate = new Date();
-      }
+      await axios
+        .get(`http://localhost:9000/users/${id}`)
+        .then((response) => {
+          let previousDate = response.data.expired_subs;
+          console.log(previousDate);
+          const millisecondsInADay = 1000 * 60 * 60 * 24;
+          if (previousDate === "") {
+            previousDate = new Date();
+          }
+          Cookies.set("user-membership", "premium", { path: "/" });
 
-      await axios.patch(`http://localhost:9000/users/2`, {
-        membership: "premium",
-        expired_subs: new Date(
-          previousDate.getTime() + millisecondsInADay * 30 * type
-        ),
-      });
-      mutate();
+          return axios.patch(`http://localhost:9000/users/${id}`, {
+            membership: "premium",
+            expired_subs: new Date(
+              previousDate.getTime() + millisecondsInADay * 30 * months
+            ),
+          });
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+      router.push("/user");
     } catch (error) {
       console.error(error);
     }
@@ -135,20 +147,36 @@ export default function Subscription() {
             </div>
             <ul>
               <li className="flex flex-row gap-3 text-muted-foreground">
-                <FaCheck />
-                Benefit 1
+                <div className="pt-1">
+                  <IconContext.Provider value={{ color: "orange" }}>
+                    <FaCheck />
+                  </IconContext.Provider>
+                </div>
+                Exclusive Content Access
               </li>
               <li className="flex flex-row gap-3 text-muted-foreground">
-                <FaCheck />
-                Benefit 2
+                <div className="pt-1">
+                  <IconContext.Provider value={{ color: "orange" }}>
+                    <FaCheck />
+                  </IconContext.Provider>
+                </div>
+                Ad-Free Experience
               </li>
               <li className="flex flex-row gap-3 text-muted-foreground">
-                <FaCheck />
-                Benefit 3
+                <div className="pt-1">
+                  <IconContext.Provider value={{ color: "orange" }}>
+                    <FaCheck />
+                  </IconContext.Provider>
+                </div>
+                Early Access or Sneak Peeks
               </li>
               <li className="flex flex-row gap-3 text-muted-foreground">
-                <FaCheck />
-                Benefit 4
+                <div className="pt-1">
+                  <IconContext.Provider value={{ color: "orange" }}>
+                    <FaCheck />
+                  </IconContext.Provider>
+                </div>
+                Community or Engagement Features
               </li>
             </ul>
           </div>
@@ -184,10 +212,7 @@ export default function Subscription() {
               </DialogHeader>
               <DialogFooter>
                 <DialogClose>
-                  <Button
-                    type="button"
-                    onClick={() => activateSubscription(user.id, type)}
-                  >
+                  <Button type="button" onClick={() => activateSubscription()}>
                     Place my order
                   </Button>
                 </DialogClose>

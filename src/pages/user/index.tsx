@@ -1,7 +1,7 @@
 import { RootState } from "@/store/store";
 import { UserData } from "@/types";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CgProfile } from "react-icons/cg";
 import { useSelector } from "react-redux";
 
@@ -9,15 +9,19 @@ export default function Profile() {
   const { id } = useSelector((state: RootState) => state.user);
   const [userData, setUserData] = useState<UserData>();
 
-  const fetchUserData = async () => {
-    try {
-      const response = await axios.get(`http://localhost:9000/users/${id}`);
-      setUserData(response.data);
-    } catch (error) {
-      console.error("Error fetching news data:", error);
-    }
-  };
-  fetchUserData();
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:9000/users/${id}`);
+        const fetchedData = response.data;
+        setUserData(fetchedData);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, [id]);
 
   return (
     <>
