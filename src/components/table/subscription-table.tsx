@@ -34,115 +34,96 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "./ui/badge";
-import { TransactionData } from "@/types";
+import { UserData } from "@/types";
 import { useState } from "react";
 import axios from "axios";
 import useSWR from "swr";
 
-function TransactionTable() {
+function SubscriptionTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const [transactions, setTransactions] = useState<TransactionData[]>([]);
+  const [users, setUsers] = useState<UserData[]>([]);
 
   const { data, mutate } = useSWR(
-    "http://localhost:9000/transactions",
+    "http://localhost:9000/users",
     async (url) => {
       const response = await axios.get(url);
-      const fetchedTransactions: TransactionData[] = response.data;
-      setTransactions(fetchedTransactions);
+      const fetchedNews: UserData[] = response.data;
+      setUsers(fetchedNews);
     }
   );
 
-  const handleTransactionStatus = async (
-    transactionId: string,
-    status: string
-  ) => {
+  const deactivateSubscription = async (userId: string) => {
     try {
-      await axios.patch(`http://localhost:9000/transactions/${transactionId}`, {
-        status: status,
-        transaction_updated_date: new Date(),
+      await axios.patch(`http://localhost:9000/users/${userId}`, {
+        membership: "basic",
       });
-
-      if (status === "completed") {
-        const email = transactions[Number(transactionId) - 1].user;
-        const type = transactions[Number(transactionId) - 1].type;
-
-        await axios
-          .get(`http://localhost:9000/users?email=${email}`)
-          .then((response) => {
-            let previousDate = response.data[0].expired_subs;
-            const millisecondsInADay = 1000 * 60 * 60 * 24;
-            if (previousDate === "") {
-              previousDate = new Date();
-            }
-            return axios.patch(
-              `http://localhost:9000/users/${response.data[0].id}`,
-              {
-                expired_subs: new Date(
-                  previousDate.getTime() + millisecondsInADay * 30 * type
-                ),
-              }
-            );
-          })
-          .catch((error) => {
-            console.error(error);
-          });
-      }
       mutate();
     } catch (error) {
       console.error(error);
     }
   };
 
-  const columns: ColumnDef<TransactionData>[] = [
+  const columns: ColumnDef<UserData>[] = [
     {
       accessorKey: "id",
       header: "ID",
       cell: ({ row }) => <div className="capitalize">{row.getValue("id")}</div>,
     },
     {
-      accessorKey: "status",
+      accessorKey: "membership",
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Status
+            Member
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         );
       },
       cell: ({ row }) => (
-        <div className="capitalize pl-4">{row.getValue("status")}</div>
+        <div className="capitalize pl-4">{row.getValue("membership")}</div>
       ),
     },
     {
-      accessorKey: "user",
-      header: "User Email",
-      cell: ({ row }) => (
-        <div className="lowercase">{row.getValue("user")}</div>
-      ),
-    },
-    {
-      accessorKey: "transaction_date",
+      accessorKey: "email",
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Transaction Date
+            Email
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        );
+      },
+      cell: ({ row }) => (
+        <div className="lowercase pl-4">{row.getValue("email")}</div>
+      ),
+    },
+    {
+      accessorKey: "expired_subs",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Expire Date
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         );
       },
       cell: ({ row }) => (
         <div className="lowercase pl-4">
-          {new Date(row.getValue("transaction_date")).toLocaleDateString()}
+          {row.getValue("membership") === "basic"
+            ? ""
+            : new Date(row.getValue("expired_subs")).toLocaleDateString()}
         </div>
       ),
     },
@@ -150,66 +131,47 @@ function TransactionTable() {
       id: "actions",
       enableHiding: false,
       cell: ({ row }) => {
-        if (row.getValue("status") === "processing") {
+        if (row.getValue("membership") === "premium") {
           return (
             <Dialog>
               <DialogTrigger asChild>
-                <Button>Awaiting Action..</Button>
+                <Button>Deactivate</Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                   <DialogTitle className="text-3xl">
-                    Complete transaction?
+                    Deactivate Subscription
                   </DialogTitle>
                   <DialogDescription className="text-base">
-                    Complete this transaction? <br />
-                    This action can not be undone
+                    Deactivate{" "}
+                    <span className=" font-semibold">
+                      {row.getValue("email")}{" "}
+                    </span>
+                    subscription? <br />
+                    This action can not be undone.
                   </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
                   <DialogClose>
                     <Button
                       type="button"
-                      onClick={() =>
-                        handleTransactionStatus(row.getValue("id"), "canceled")
-                      }
+                      onClick={() => deactivateSubscription(row.getValue("id"))}
                     >
-                      Cancel
-                    </Button>
-                    <Button
-                      type="button"
-                      onClick={() =>
-                        handleTransactionStatus(row.getValue("id"), "completed")
-                      }
-                    >
-                      Complete
+                      Deactivate
                     </Button>
                   </DialogClose>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
           );
-        } else {
-          return (
-            <Badge
-              className={`pointer-events-none rounded-xl px-3 py-1 font-semibold ${
-                row.getValue("status") === "completed"
-                  ? "border-none bg-green-100 text-green-500"
-                  : row.getValue("status") === "canceled"
-                  ? "border-none bg-red-200 text-red-500"
-                  : null
-              }`}
-            >
-              {row.getValue("status")}
-            </Badge>
-          );
         }
+        return null;
       },
     },
   ];
 
   const table = useReactTable({
-    data: transactions,
+    data: users,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -239,9 +201,9 @@ function TransactionTable() {
         <div className="flex items-end py-4">
           <Input
             placeholder="Filter emails..."
-            value={(table.getColumn("user")?.getFilterValue() as string) ?? ""}
+            value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
             onChange={(event) =>
-              table.getColumn("user")?.setFilterValue(event.target.value)
+              table.getColumn("email")?.setFilterValue(event.target.value)
             }
             className="max-w-sm"
           />
@@ -322,4 +284,4 @@ function TransactionTable() {
   );
 }
 
-export default TransactionTable;
+export default SubscriptionTable;

@@ -91,7 +91,7 @@ const SignUpForm = () => {
       const poster = async (url: string) => {
         const response = await axios.post(url, {
           role: "user",
-          member: "basic",
+          membership: "basic",
           name: formData.name,
           username: formData.username,
           email: formData.email,

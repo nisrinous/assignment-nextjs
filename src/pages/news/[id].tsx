@@ -19,6 +19,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { RootState } from "@/store/store";
+import { useSelector } from "react-redux";
 
 export default function Details() {
   const router = useRouter();
@@ -35,6 +37,7 @@ export default function Details() {
     share: 0,
   });
   const { id } = router.query;
+  const { membership } = useSelector((state: RootState) => state.user);
 
   const { data, mutate } = useSWR(
     `http://localhost:9000/news/${id}`,
@@ -79,7 +82,7 @@ export default function Details() {
 
   return (
     <div className="relative">
-      {news.isPremium ? (
+      {membership === "basic" && news.isPremium ? (
         <div className="absolute protected-news h-1/2 w-full bottom-0">
           <div className="absolute bottom-40 right-0 left-0">
             <h1 className="tracking-tighter lg:leading-[1.1] text-2xl md:text-3xl text-center flex flex-row justify-center">
@@ -98,16 +101,18 @@ export default function Details() {
           </div>
         </div>
       ) : null}
-      <div className="container flex flex-col justify-start px-80 py-20">
+      <div className="container flex flex-col justify-start lg:px-80 lg:py-20">
         <img src={news.image} className="mb-10" alt=""></img>
 
         <div className="my-10">
-          <div className="flex flex-row">
-            <IconContext.Provider value={{ color: "orange" }}>
-              <PiSparkleLight size={20} />
-            </IconContext.Provider>
-            <h3 className="mb-3 text-lg"> Member Only</h3>
-          </div>
+          {news.isPremium ? (
+            <div className="flex flex-row">
+              <IconContext.Provider value={{ color: "orange" }}>
+                <PiSparkleLight size={20} />
+              </IconContext.Provider>
+              <h3 className="mb-3 text-lg"> Member Only</h3>
+            </div>
+          ) : null}
 
           <h1 className="font-heading text-2xl sm:text-4xl md:text-5xl lg:text-6xl">
             {news.title}

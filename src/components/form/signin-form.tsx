@@ -63,7 +63,7 @@ const SignInForm = () => {
       Cookies.set("authToken", "generatedToken", { path: "/" });
       Cookies.set("user-role", data[0].role, { path: "/" });
       Cookies.set("user-id", data[0].id, { path: "/" });
-      Cookies.set("user-membership", data[0].member, { path: "/" });
+      Cookies.set("user-membership", data[0].membership, { path: "/" });
 
       router.push("/news");
     }

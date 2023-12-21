@@ -60,7 +60,7 @@ export default function Profile() {
               Membership
             </p>
             <p className="text-muted-foreground">
-              Membeship: {userData?.member}
+              Membeship: {userData?.membership}
             </p>
             <p className="text-muted-foreground">
               Expire Date: {userData?.expired_subs}

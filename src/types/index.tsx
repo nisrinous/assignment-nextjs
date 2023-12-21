@@ -1,7 +1,7 @@
 export type UserData = {
   id: string;
   role: "user" | "admin";
-  member: "premium" | "basic";
+  membership: "premium" | "basic";
   name: string;
   username: string;
   email: string;

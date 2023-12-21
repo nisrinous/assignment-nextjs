@@ -17,28 +17,41 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { UserData } from "@/types";
 import axios from "axios";
 import { useState } from "react";
 import { FaCheck } from "react-icons/fa6";
+import useSWR from "swr";
 
 export default function Subscription() {
   const [onSubs, setOnSubs] = useState<boolean>(false);
-  const [type, setType] = useState<string>("");
-  const handleSubscription = (type: string) => {
+  const [type, setType] = useState<number>();
+  const [user, setUser] = useState<UserData>();
+
+  const handleSubscription = (type: number) => {
     setOnSubs(true);
     setType(type);
   };
 
-  const activateSubscription = async (userId: string, type: string) => {
+  const { data, mutate } = useSWR(
+    "http://localhost:9000/users/2",
+    async (url) => {
+      const response = await axios.get(url);
+      const fetchedUser: UserData = response.data;
+      setUser(fetchedUser);
+    }
+  );
+
+  const activateSubscription = async (userId: string, type: number) => {
     try {
-      let previousDate = user.expired_subs;
+      let previousDate = user?.expired_subs;
       const millisecondsInADay = 1000 * 60 * 60 * 24;
       if (previousDate === "") {
         previousDate = new Date();
       }
 
-      await axios.patch(`http://localhost:9000/users/${userId}`, {
-        member: "premium",
+      await axios.patch(`http://localhost:9000/users/2`, {
+        membership: "premium",
         expired_subs: new Date(
           previousDate.getTime() + millisecondsInADay * 30 * type
         ),
@@ -150,7 +163,6 @@ export default function Subscription() {
                 <DialogDescription className="text-base">
                   <div className="flex flex-col p-3 gap-2">
                     <h3 className="text-3xl mb-3">Yearly Subscription</h3>
-
                     <div className="flex flex-row justify-between">
                       <p className="text-muted-foreground">Subtotal</p>
                       <p className="text-muted-foreground">
@@ -164,7 +176,6 @@ export default function Subscription() {
                     <div className="flex flex-row justify-between my-5">
                       <p className="text-muted-foreground font-bold">Total</p>
                       <p className="text-muted-foreground">
-                        {" "}
                         ${type === "for a year" ? 99.7 : 9.7}
                       </p>
                     </div>

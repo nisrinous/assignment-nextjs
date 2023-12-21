@@ -34,96 +34,116 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { UserData } from "@/types";
+import { Badge } from "../ui/badge";
+import { TransactionData } from "@/types";
 import { useState } from "react";
 import axios from "axios";
 import useSWR from "swr";
 
-function SubscriptionTable() {
+function TransactionTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const [users, setUsers] = useState<UserData[]>([]);
+  const [transactions, setTransactions] = useState<TransactionData[]>([]);
 
   const { data, mutate } = useSWR(
-    "http://localhost:9000/users",
+    "http://localhost:9000/transactions",
     async (url) => {
       const response = await axios.get(url);
-      const fetchedNews: UserData[] = response.data;
-      setUsers(fetchedNews);
+      const fetchedTransactions: TransactionData[] = response.data;
+      setTransactions(fetchedTransactions);
     }
   );
 
-  const deactivateSubscription = async (userId: string) => {
+  const handleTransactionStatus = async (
+    transactionId: string,
+    status: string
+  ) => {
     try {
-      await axios.patch(`http://localhost:9000/users/${userId}`, {
-        member: "basic",
+      await axios.patch(`http://localhost:9000/transactions/${transactionId}`, {
+        status: status,
+        transaction_updated_date: new Date(),
       });
+
+      if (status === "completed") {
+        const email = transactions[Number(transactionId) - 1].user;
+        const type = transactions[Number(transactionId) - 1].type;
+
+        await axios
+          .get(`http://localhost:9000/users?email=${email}`)
+          .then((response) => {
+            let previousDate = response.data[0].expired_subs;
+            const millisecondsInADay = 1000 * 60 * 60 * 24;
+            if (previousDate === "") {
+              previousDate = new Date();
+            }
+            return axios.patch(
+              `http://localhost:9000/users/${response.data[0].id}`,
+              {
+                membership: "premium",
+                expired_subs: new Date(
+                  previousDate.getTime() + millisecondsInADay * 30 * type
+                ),
+              }
+            );
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
       mutate();
     } catch (error) {
       console.error(error);
     }
   };
 
-  const columns: ColumnDef<UserData>[] = [
+  const columns: ColumnDef<TransactionData>[] = [
     {
       accessorKey: "id",
       header: "ID",
       cell: ({ row }) => <div className="capitalize">{row.getValue("id")}</div>,
     },
     {
-      accessorKey: "member",
+      accessorKey: "status",
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Member
+            Status
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         );
       },
       cell: ({ row }) => (
-        <div className="capitalize pl-4">{row.getValue("member")}</div>
+        <div className="capitalize pl-4">{row.getValue("status")}</div>
       ),
     },
     {
-      accessorKey: "email",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Email
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        );
-      },
+      accessorKey: "user",
+      header: "User Email",
       cell: ({ row }) => (
-        <div className="lowercase pl-4">{row.getValue("email")}</div>
+        <div className="lowercase">{row.getValue("user")}</div>
       ),
     },
     {
-      accessorKey: "expired_subs",
+      accessorKey: "transaction_date",
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Expire Date
+            Transaction Date
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         );
       },
       cell: ({ row }) => (
         <div className="lowercase pl-4">
-          {row.getValue("member") === "basic"
-            ? ""
-            : new Date(row.getValue("expired_subs")).toLocaleDateString()}
+          {new Date(row.getValue("transaction_date")).toLocaleDateString()}
         </div>
       ),
     },
@@ -131,47 +151,66 @@ function SubscriptionTable() {
       id: "actions",
       enableHiding: false,
       cell: ({ row }) => {
-        if (row.getValue("member") === "premium") {
+        if (row.getValue("status") === "processing") {
           return (
             <Dialog>
               <DialogTrigger asChild>
-                <Button>Deactivate</Button>
+                <Button>Awaiting Action..</Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                   <DialogTitle className="text-3xl">
-                    Deactivate Subscription
+                    Complete transaction?
                   </DialogTitle>
                   <DialogDescription className="text-base">
-                    Deactivate{" "}
-                    <span className=" font-semibold">
-                      {row.getValue("email")}{" "}
-                    </span>
-                    subscription? <br />
-                    This action can not be undone.
+                    Complete this transaction? <br />
+                    This action can not be undone
                   </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
                   <DialogClose>
                     <Button
                       type="button"
-                      onClick={() => deactivateSubscription(row.getValue("id"))}
+                      onClick={() =>
+                        handleTransactionStatus(row.getValue("id"), "canceled")
+                      }
                     >
-                      Deactivate
+                      Cancel
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={() =>
+                        handleTransactionStatus(row.getValue("id"), "completed")
+                      }
+                    >
+                      Complete
                     </Button>
                   </DialogClose>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
           );
+        } else {
+          return (
+            <Badge
+              className={`pointer-events-none rounded-xl px-3 py-1 font-semibold ${
+                row.getValue("status") === "completed"
+                  ? "border-none bg-green-100 text-green-500"
+                  : row.getValue("status") === "canceled"
+                  ? "border-none bg-red-200 text-red-500"
+                  : null
+              }`}
+            >
+              {row.getValue("status")}
+            </Badge>
+          );
         }
-        return null;
       },
     },
   ];
 
   const table = useReactTable({
-    data: users,
+    data: transactions,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -201,9 +240,9 @@ function SubscriptionTable() {
         <div className="flex items-end py-4">
           <Input
             placeholder="Filter emails..."
-            value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+            value={(table.getColumn("user")?.getFilterValue() as string) ?? ""}
             onChange={(event) =>
-              table.getColumn("email")?.setFilterValue(event.target.value)
+              table.getColumn("user")?.setFilterValue(event.target.value)
             }
             className="max-w-sm"
           />
@@ -284,4 +323,4 @@ function SubscriptionTable() {
   );
 }
 
-export default SubscriptionTable;
+export default TransactionTable;

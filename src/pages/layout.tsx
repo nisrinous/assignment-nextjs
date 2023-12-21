@@ -9,7 +9,8 @@ type Layout = {
 
 export default function Layout({ children }: Layout) {
   const router = useRouter();
-  const isDashboard = router.pathname.startsWith("/news");
+  const isAdminPage = router.pathname.startsWith("/admin");
+  const isUserPage = router.pathname.startsWith("/user");
 
   if (router.pathname.includes("/auth/signin")) return children;
   if (router.pathname.includes("/auth/signup")) return children;
@@ -17,15 +18,16 @@ export default function Layout({ children }: Layout) {
   return (
     <>
       <Header />
-      {!isDashboard && (
-        <div className="bg-white bg-opacity-70">
-          <div className="container flex flex-row">
-            <Aside />
-            {children}
+      {isAdminPage ||
+        (isUserPage && (
+          <div className="bg-white bg-opacity-70">
+            <div className="container flex flex-row">
+              <Aside />
+              {children}
+            </div>
           </div>
-        </div>
-      )}
-      {isDashboard && <div>{children}</div>}
+        ))}
+      {!isAdminPage && !isUserPage && <div>{children}</div>}
       <Footer />
     </>
   );
