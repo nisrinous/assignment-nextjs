@@ -47,7 +47,7 @@ function SubscriptionTable() {
   const [users, setUsers] = useState<UserData[]>([]);
 
   const { data, mutate } = useSWR(
-    "http://localhost:9000/users",
+    "http://localhost:9000/users?role=user",
     async (url) => {
       const response = await axios.get(url);
       const fetchedNews: UserData[] = response.data;
