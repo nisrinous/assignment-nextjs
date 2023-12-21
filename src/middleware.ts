@@ -3,8 +3,8 @@ import { NextResponse, type NextRequest } from "next/server";
 export function middleware(request: NextRequest) {
   const token = request.cookies.get("authToken")?.value;
   const role = request.cookies.get("user-role")?.value;
-  const userid = request.cookies.get("user-d")?.value;
-  const membership = request.cookies.get("user-membership");
+  const id = request.cookies.get("user-id")?.value;
+  const membership = request.cookies.get("user-membership")?.value;
 
   if (
     request.nextUrl.pathname.startsWith("/admin") &&

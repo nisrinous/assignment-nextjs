@@ -6,7 +6,6 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import TrendingCard from "@/components/card/trending-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import NewsCard from "@/components/card/news-card";
-import { Button } from "@/components/ui/button";
 import Hero from "@/components/hero";
 import { ArrowUpDown } from "lucide-react";
 

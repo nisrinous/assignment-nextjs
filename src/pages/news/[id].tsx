@@ -83,7 +83,7 @@ export default function Details() {
         <div className="absolute protected-news h-1/2 w-full bottom-0">
           <div className="absolute bottom-40 right-0 left-0">
             <h1 className="tracking-tighter lg:leading-[1.1] text-2xl md:text-3xl text-center flex flex-row justify-center">
-              <Link href="/profile/subscription">
+              <Link href="/user/subscription">
                 <Button
                   variant="link"
                   className="tracking-tighter lg:leading-[1.1] text-2xl md:text-3xl text-center"
@@ -102,6 +102,13 @@ export default function Details() {
         <img src={news.image} className="mb-10" alt=""></img>
 
         <div className="my-10">
+          <div className="flex flex-row">
+            <IconContext.Provider value={{ color: "orange" }}>
+              <PiSparkleLight size={20} />
+            </IconContext.Provider>
+            <h3 className="mb-3 text-lg"> Member Only</h3>
+          </div>
+
           <h1 className="font-heading text-2xl sm:text-4xl md:text-5xl lg:text-6xl">
             {news.title}
           </h1>
@@ -122,8 +129,8 @@ export default function Details() {
                   day: "numeric",
                 })}
           </div>
-          <div className="flex flex-row items-center justify-start gap-2">
-            <div className="gap-0 flex flex-row justify-center items-center">
+          <div className="flex flex-row items-center justify-start gap-3">
+            <div className="gap-1 flex flex-row justify-center items-center">
               <Button
                 variant="ghost"
                 className="hover:bg-transparent p-0"

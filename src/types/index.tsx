@@ -32,6 +32,8 @@ export type NewsDetail = {
   image: string;
   isPremium: boolean;
   newsId: string;
+  created_at: string;
+  updated_at: string;
 };
 
 export type TransactionData = {

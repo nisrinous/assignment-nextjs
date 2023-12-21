@@ -1,12 +1,22 @@
+import { RootState } from "@/store/store";
+import { useSelector } from "react-redux";
+
 const Aside = () => {
+  const { role } = useSelector((state: RootState) => state.user);
+
   return (
     <aside className="bg-white fixed hidden w-1/6 shrink-0 overflow-y-auto border-r md:sticky md:block">
       <div className="overflow-hidden py-6 pr-6">
         <div className="h-full w-full rounded-[inherit]">
           <div className="min-w-full table">
             <img className=""></img>
-            <div className="flex w-full flex-col gap-2 p-5 mt-10">
-              <a aria-label="Account" target="" rel="" href="/admin">
+            <div className="flex w-full flex-col gap-2 mt-10">
+              <a
+                aria-label="Account"
+                target=""
+                rel=""
+                href={`${role === "admin" ? "/admin" : "/user"}`}
+              >
                 <span className="group flex w-full items-center rounded-md border border-transparent px-2 py-1 hover:bg-muted hover:text-foreground text-muted-foreground">
                   <svg
                     width="15"
@@ -27,7 +37,13 @@ const Aside = () => {
                   <span>Account</span>
                 </span>
               </a>
-              <a aria-label="Stores" target="" rel="" href="/admin/news">
+              <a
+                aria-label="Stores"
+                target=""
+                rel=""
+                href="/admin/news"
+                className={`${role !== "admin" ? "hidden" : null}`}
+              >
                 <span className="group flex w-full items-center rounded-md border border-transparent px-2 py-1 hover:bg-muted hover:text-foreground text-muted-foreground">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -53,7 +69,11 @@ const Aside = () => {
                 aria-label="Billing"
                 target=""
                 rel=""
-                href="/admin/subscriptions"
+                href={`${
+                  role === "admin"
+                    ? "/admin/subscriptions"
+                    : "/user/subscription"
+                }`}
               >
                 <span className="group flex w-full items-center rounded-md border border-transparent px-2 py-1 hover:bg-muted hover:text-foreground text-muted-foreground">
                   <svg
@@ -78,6 +98,7 @@ const Aside = () => {
                 target=""
                 rel=""
                 href="/admin/transactions"
+                className={`${role !== "admin" ? "hidden" : null}`}
               >
                 <span className="group flex w-full items-center rounded-md border border-transparent px-2 py-1 hover:bg-muted hover:text-foreground text-muted-foreground">
                   <svg

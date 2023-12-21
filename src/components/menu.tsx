@@ -12,16 +12,37 @@ import Link from "next/link";
 import { CiUser } from "react-icons/ci";
 import { PiSparkleLight } from "react-icons/pi";
 import { IconContext } from "react-icons";
-import Cookies from "universal-cookie";
+import Cookies from "js-cookie";
+
 import router from "next/router";
+import { useDispatch } from "react-redux";
+import { setAttribute } from "@/store/slices/userSlice";
+import { useEffect } from "react";
 
 const Menu = () => {
+  const dispatch = useDispatch();
+  const token = Cookies.get("authToken");
+
   const logout = () => {
-    const cookies = new Cookies();
-    cookies.remove("user-role", { path: "/" });
-    cookies.remove("user-id", { path: "/" });
+    Cookies.remove("user-role", { path: "/" });
+    Cookies.remove("user-id", { path: "/" });
+    Cookies.remove("user-membership", { path: "/" });
+    Cookies.remove("authToken", { path: "/" });
     router.push("/auth/signin");
   };
+
+  useEffect(() => {
+    if (token) {
+      dispatch(
+        setAttribute({
+          token: token,
+          id: Cookies.get("user-id"),
+          role: Cookies.get("user-role"),
+          membership: Cookies.get("user-membership"),
+        })
+      );
+    }
+  });
 
   return (
     <DropdownMenu>
@@ -35,12 +56,12 @@ const Menu = () => {
         <DropdownMenuSeparator />
         <DropdownMenuGroup className="text-right">
           <DropdownMenuItem>
-            <Link href="/profile">
+            <Link href="/user">
               <span>Profile</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
-            <Link href="/profile/subscription" className="flex flex-row">
+            <Link href="/user/subscription" className="flex flex-row">
               <span>Premium </span>
               <IconContext.Provider value={{ color: "yellow" }}>
                 <PiSparkleLight />
