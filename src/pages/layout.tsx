@@ -2,7 +2,6 @@ import { useRouter } from "next/router";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import Aside from "@/components/aside";
-import AsideUser from "@/components/aside-user";
 
 type Layout = {
   children: React.ReactNode;

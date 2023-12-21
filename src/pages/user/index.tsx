@@ -1,6 +1,24 @@
+import { RootState } from "@/store/store";
+import { UserData } from "@/types";
+import axios from "axios";
+import { useState } from "react";
 import { CgProfile } from "react-icons/cg";
+import { useSelector } from "react-redux";
 
 export default function Profile() {
+  const { id } = useSelector((state: RootState) => state.user);
+  const [userData, setUserData] = useState<UserData>();
+
+  const fetchUserData = async () => {
+    try {
+      const response = await axios.get(`http://localhost:9000/users/${id}`);
+      setUserData(response.data);
+    } catch (error) {
+      console.error("Error fetching news data:", error);
+    }
+  };
+  fetchUserData();
+
   return (
     <>
       <div className="w-screen p-10 bg-white">
@@ -13,43 +31,52 @@ export default function Profile() {
           </p>
         </div>
         <div className="flex flex-col gap-5 mb-10">
-          <div>
-            <div className="my-2">
+          <div className="flex flex-row justify-start items-center gap-5 my-3">
+            <div>
               <CgProfile size={70} />
             </div>
-            <h3>@Username</h3>
+            <div>
+              <p className="leading-tight sm:text-lg sm:leading-8">Username:</p>
+              <p className="text-lg text-muted-foreground">
+                @{userData?.username}
+              </p>
+            </div>
           </div>
 
           <div>
-            <p className="leading-tight sm:text-lg sm:leading-8 border-b pb-1">
+            <p className="leading-tight sm:text-lg sm:leading-8 border-b">
               Account Name
             </p>
-            <p className="text-muted-foreground">Full name</p>
+            <p className="text-muted-foreground">{userData?.name}</p>
           </div>
           <div>
-            <p className="leading-tight sm:text-lg sm:leading-8 border-b pb-1">
+            <p className="leading-tight sm:text-lg sm:leading-8 border-b">
               E-mail
             </p>
-            <p className="text-muted-foreground">E-mail</p>
+            <p className="text-muted-foreground">{userData?.email}</p>
           </div>
           <div>
-            <p className="leading-tight sm:text-lg sm:leading-8 border-b pb-1">
+            <p className="leading-tight sm:text-lg sm:leading-8 border-b">
               Membership
             </p>
-            <p className="text-muted-foreground">Member</p>
-            <p className="text-muted-foreground">Expire Date: </p>
+            <p className="text-muted-foreground">
+              Membeship: {userData?.member}
+            </p>
+            <p className="text-muted-foreground">
+              Expire Date: {userData?.expired_subs}
+            </p>
           </div>
           <div>
-            <p className="leading-tight sm:text-lg sm:leading-8 border-b pb-1">
+            <p className="leading-tight sm:text-lg sm:leading-8 border-b">
               Address
             </p>
-            <p className="text-muted-foreground">Address</p>
+            <p className="text-muted-foreground">{userData?.address}</p>
           </div>
           <div>
-            <p className="leading-tight sm:text-lg sm:leading-8 border-b pb-1">
+            <p className="leading-tight sm:text-lg sm:leading-8 border-b">
               Phone Number
             </p>
-            <p className=" text-muted-foreground">Address</p>
+            <p className=" text-muted-foreground">{userData?.phonenumber}</p>
           </div>
         </div>
       </div>
